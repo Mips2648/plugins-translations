@@ -8,7 +8,7 @@ class JeedomCoreTranslations:
 
     def __init__(self) -> None:
         self._core_root = Path.cwd()/'jeedom_core'
-        self._all_translations: Translations
+        self._all_translations = Translations()
 
     def parse(self):
         if not self._core_root.exists():
