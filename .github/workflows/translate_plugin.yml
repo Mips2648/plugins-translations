@@ -40,7 +40,7 @@ jobs:
       - name: "Create Pull Request..."
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: "update-translations"
+          branch: "translations"
           delete-branch: true
           add-paths: core/i18n/*.json
           title: "Update translations"
