@@ -69,9 +69,13 @@ class TranslatePlugin():
         for file in self._files.values():
             for prompt in file.get_prompts().values():
                 if prompt.getText() in self._previous_translations:
-                    prompt.setTranslations(self._previous_translations.getTranslations(prompt.getText()))
+                    tr = self._previous_translations.getTranslations(prompt.getText())
+                    print(f"find previous translation for {prompt.getText()} => {tr}")
+                    prompt.setTranslations(tr)
                 elif prompt.getText() in self._jeedom_core_translations.getTranslations():
-                    prompt.setTranslation(self._jeedom_core_translations.getTranslations().getTranslations(prompt.getText()))
+                    tr = self._jeedom_core_translations.getTranslations().getTranslations(prompt.getText())
+                    print(f"find previous translation for {prompt.getText()} => {tr}")
+                    prompt.setTranslation(tr)
 
 
     def get_previous_translations(self):
