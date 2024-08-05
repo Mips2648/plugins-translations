@@ -28,7 +28,7 @@ jobs:
         run: |
           pwd
           ls -la
-          python .github/workflows/compile_translations.py --source home/core/core/i18n --destination $GITHUB_WORKSPACE
+          python translations/.github/workflows/compile_translations.py --source home/core/core/i18n --destination $GITHUB_WORKSPACE
 
       - name: "commit change"
         run: |
