@@ -23,7 +23,7 @@ jobs:
 
       - name: Compile all translations prompts
         run: |
-          ls -la
+          ls -la /
           python .github/workflows/compile_translations.py --source ./core/core/i18n --destination $GITHUB_WORKSPACE
 
       - name: "commit change"
