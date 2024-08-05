@@ -27,7 +27,7 @@ jobs:
 
       - name: Compile all translations prompts
         run: |
-          python translations/.github/workflows/compile_translations.py --source core/core/i18n --destination $GITHUB_WORKSPACE/translations
+          python translations/src/compile_core_translations.py --source core/core/i18n --destination $GITHUB_WORKSPACE/translations
 
       - name: "Commit changes"
         run: |

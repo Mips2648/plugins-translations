@@ -2,20 +2,9 @@ import argparse
 import json
 from pathlib import Path
 
-EN_US = "en_US"
-FR_FR = "fr_FR"
-ES_ES = "es_ES"
-DE_DE = "de_DE"
+from consts import LANGUAGES
 
-LANGUAGES = [
-    EN_US,
-    FR_FR,
-    ES_ES,
-    DE_DE
-]
-
-
-class CompileTranslations:
+class CompileCoreTranslations:
 
     def __init__(self) -> None:
         parser = argparse.ArgumentParser(description='Daemon for Jeedom plugin')
@@ -81,4 +70,4 @@ class CompileTranslations:
 
 
 if __name__ == "__main__":
-    CompileTranslations().start()
+    CompileCoreTranslations().start()
