@@ -1,22 +1,31 @@
-name: translate
+name: Translate workflow
 
 # Controls when the workflow will run
 on:
   workflow_call:
 
 env:
-  mips2648-translations: "mips2648-translations"
+  mips2648-translations: "mips2648_translations"
 
 jobs:
   translate:
     runs-on: ubuntu-latest
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      # Checks-out plugin repository under $GITHUB_WORKSPACE
       - uses: actions/checkout@v4
+
+      # Checks-out Mips2648/jeedom-translations to get python scripts
       - uses: actions/checkout@v4
         with:
           repository: 'Mips2648/jeedom-translations'
           path: ${{ env.mips2648-translations }}
+
+      # Checks-out jeedom/core to get get use core translation as default
+      - uses: actions/checkout@v4
+        with:
+          repository: 'jeedom/core'
+          path: 'jeedom_core'
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
