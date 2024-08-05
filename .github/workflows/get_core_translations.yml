@@ -15,24 +15,21 @@ jobs:
           repository: 'core'
           branch: 'alpha'
           depth: 1
-      - name: Access cloned repository content
+      - name: list cloned repository content
         run: |
-          pwd
-          cd core/core/i18n
-          ls -la
+          ls -la core/core/i18n
       - uses: actions/checkout@v4
         with:
           path: 'translations'
 
       - name: Compile all translations prompts
         run: |
-          pwd
-          ls -la
           python translations/.github/workflows/compile_translations.py --source core/core/i18n --destination $GITHUB_WORKSPACE/translations
 
-      - name: "commit change"
+      - name: "Commit changes"
         run: |
           cd $GITHUB_WORKSPACE/translations
+          ls -la
           git config user.name github-actions
           git config user.email github-actions@github.com
           git diff --quiet || (git add *.json && git commit -m 'update translations')
