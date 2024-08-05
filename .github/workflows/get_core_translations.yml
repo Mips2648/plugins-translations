@@ -1,6 +1,9 @@
 name: get core translations
 
 on:
+  schedule:
+    - cron: "50 5 * * *"
+
   workflow_dispatch:
 
 jobs:
