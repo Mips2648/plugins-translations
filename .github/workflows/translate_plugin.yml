@@ -6,6 +6,7 @@ on:
 
 env:
   mips2648-translations: "mips2648_translations"
+  branch-name: "translations"
 
 jobs:
   translate:
@@ -35,12 +36,13 @@ jobs:
       - name: "Generate translations..."
         run: |
           python --version
+          git branch ${{ env.branch-name }}
           python ${{ env.mips2648-translations }}/src/translate_plugin.py
 
       - name: "Create Pull Request..."
         uses: peter-evans/create-pull-request@v6
         with:
-          branch: "translations"
+          branch: ${{ env.branch-name }}
           delete-branch: true
           add-paths: core/i18n/*.json
           title: "Update translations"
