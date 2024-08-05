@@ -13,7 +13,7 @@ class TranslatePlugin():
         self._plugin_name: str
 
         self._files: dict[str, SourceFile] = {}
-        self._previous_translations = Translations()
+        self._existing_translations = Translations()
 
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()
@@ -21,7 +21,7 @@ class TranslatePlugin():
         self.__read_info_json()
 
     def start(self):
-        self.get_previous_translations()
+        self.get_plugin_translations()
         self.get_core_translations()
         self.find_prompts_in_all_files()
         self.do_translate()
@@ -67,46 +67,28 @@ class TranslatePlugin():
         print("Find existing translations...")
         for file in self._files.values():
             for prompt in file.get_prompts().values():
-                if prompt.getText() in self._previous_translations:
-                    tr = self._previous_translations.getTranslations(prompt.getText())
-                    print(f"find previous translation for {prompt.getText()} => {tr}")
-                    prompt.setTranslations(tr)
-                elif prompt.getText() in self._core_translations:
-                    tr = self._core_translations.getTranslations(prompt.getText())
-                    print(f"find core translation for {prompt.getText()} => {tr}")
+                if prompt.getText() in self._existing_translations:
+                    tr = self._existing_translations.getTranslations(prompt.getText())
+                    print(f"find translation for {prompt.getText()} => {tr}")
                     prompt.setTranslations(tr)
 
 
-    def get_previous_translations(self):
-        print("Read existing translations file...")
-        for language in LANGUAGES:
-            language_file = self._plugin_root/f"core/i18n/{language}.json"
-            if not language_file.exists():
-                continue
-            try:
-                data = json.loads(language_file.read_text(encoding="UTF-8"))
-            except OSError as e:
-                print(e.filename + ": " + e.strerror)
-                return False
-            except json.decoder.JSONDecodeError as e:
-                print(f"Erreur lors de la lecture du fichier {language_file}:")
-                print(f"   Ligne {e.lineno}")
-                print(f"   position {e.colno}")
-                print(f"   {e.msg}")
-                print()
-                return False
+    def get_plugin_translations(self):
+        print("Read plugin translations file...")
 
-            for path in data:
-                for text in data[path]:
-                    self._previous_translations.add_translation(language, text, data[path][text])
-        return True
+        self.get_translations_from_json_files(self._plugin_root)
 
     def get_core_translations(self):
+        print("Read core translations file...")
         if not self._core_root.exists():
             raise ValueError(f"Path {self._core_root.as_posix()} does not exists")
 
+        self.get_translations_from_json_files(self._core_root)
+
+    def get_translations_from_json_files(self, root: Path):
+
         for language in LANGUAGES:
-            file = self._core_root/f"core/i18n/{language}.json"
+            file = root/f"core/i18n/{language}.json"
             if not file.exists():
                 print(f"file {file.as_posix()} not found !?")
                 continue
@@ -114,7 +96,7 @@ class TranslatePlugin():
             data = json.loads(file.read_text(encoding="UTF-8"))
             for path in data:
                 for text in data[path]:
-                    self._core_translations.add_translation(language, text, data[path][text])
+                    self._existing_translations.add_translation(language, text, data[path][text])
 
     def write_translations(self):
         print("Ecriture du/des fichier(s) de traduction(s)...")
