@@ -130,7 +130,7 @@ class TranslatePlugin():
                 result[path] = file.get_prompts_and_translation(language)
 
             print(f"Will dump {translation_file.as_posix()}")
-            translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4), encoding="UTF-8")
+            translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
 
 if __name__ == "__main__":
     TranslatePlugin().start()
