@@ -22,6 +22,7 @@ class TranslatePlugin():
 
     def start(self):
         self.get_previous_translations()
+        self.get_core_translations()
         self.find_prompts_in_all_files()
         self.do_translate()
 
@@ -63,6 +64,7 @@ class TranslatePlugin():
                         self._files[jeedom_file_path].search_prompts()
 
     def do_translate(self):
+        print("Find existing translations...")
         for file in self._files.values():
             for prompt in file.get_prompts().values():
                 if prompt.getText() in self._previous_translations:
