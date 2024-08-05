@@ -44,7 +44,9 @@ jobs:
         with:
           branch: ${{ env.branch-name }}
           delete-branch: true
-          add-paths: core/i18n/*.json
+          add-paths: |
+            core/i18n/*.json
+            plugin_info/info.json
           title: "Update translations"
           body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations) GitHub action"
           commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
