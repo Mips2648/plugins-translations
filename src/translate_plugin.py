@@ -46,7 +46,7 @@ class TranslatePlugin():
 
         data = json.loads(info_json.read_text(encoding="UTF-8"))
         data['language'] = LANGUAGES
-        info_json.write_text(json.dumps(data, ensure_ascii=False, indent= 4), encoding="UTF-8")
+        info_json.write_text(json.dumps(data, ensure_ascii=False), encoding="UTF-8")
 
     def find_prompts_in_all_files(self):
         print("Find prompts in all plugin files")
