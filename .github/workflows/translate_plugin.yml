@@ -1,4 +1,4 @@
-name: Translate workflow
+name: Translate Plugin
 
 # Controls when the workflow will run
 on:
