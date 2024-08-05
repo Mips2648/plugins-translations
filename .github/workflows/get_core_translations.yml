@@ -17,14 +17,16 @@ jobs:
           depth: 1
       - name: Access cloned repository content
         run: |
+          pwd
           cd core/core/i18n
           ls -la
       - uses: actions/checkout@v4
 
       - name: Compile all translations prompts
         run: |
+          pwd
           ls -la /home
-          python .github/workflows/compile_translations.py --source /home/core/core/i18n --destination $GITHUB_WORKSPACE
+          # python .github/workflows/compile_translations.py --source /home/core/core/i18n --destination $GITHUB_WORKSPACE
 
       - name: "commit change"
         run: |
