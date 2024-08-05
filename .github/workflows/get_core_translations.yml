@@ -28,12 +28,12 @@ jobs:
         run: |
           pwd
           ls -la
-          python translations/.github/workflows/compile_translations.py --source core/core/i18n --destination $GITHUB_WORKSPACE
+          python translations/.github/workflows/compile_translations.py --source core/core/i18n --destination $GITHUB_WORKSPACE/translations
 
       - name: "commit change"
         run: |
           cd $GITHUB_WORKSPACE/translations
           git config user.name github-actions
           git config user.email github-actions@github.com
-          git diff --quiet || (git add *.json && git commit -m 'update translation')
+          git diff --quiet || (git add *.json && git commit -m 'update translations')
           git push
