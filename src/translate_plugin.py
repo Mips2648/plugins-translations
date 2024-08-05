@@ -18,7 +18,7 @@ class TranslatePlugin():
         self._files: dict[str, SourceFile] = {}
         self._previous_translations: Translations
 
-        self._jeedom_core_translations: JeedomCoreTranslations
+        self._jeedom_core_translations = JeedomCoreTranslations()
 
         self.__read_info_json()
         self._jeedom_core_translations.parse()
