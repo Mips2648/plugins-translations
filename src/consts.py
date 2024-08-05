@@ -13,3 +13,5 @@ LANGUAGES = [
 PLUGIN_DIRS = ['core', 'desktop', 'plugin_info']
 
 PLUGIN_INFO_JSON = 'plugin_info/info.json'
+
+CORE_ROOT = 'jeedom_core'

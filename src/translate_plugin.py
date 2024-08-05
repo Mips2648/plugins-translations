@@ -1,11 +1,8 @@
 import json
-import os
 from pathlib import Path
 
 from source_file import SourceFile
-from prompt import Prompt
-from consts import LANGUAGES, PLUGIN_DIRS, PLUGIN_INFO_JSON
-from jeedom_core_translations import JeedomCoreTranslations
+from consts import CORE_ROOT, LANGUAGES, PLUGIN_DIRS, PLUGIN_INFO_JSON
 from translations import Translations
 
 class TranslatePlugin():
@@ -18,10 +15,10 @@ class TranslatePlugin():
         self._files: dict[str, SourceFile] = {}
         self._previous_translations = Translations()
 
-        self._jeedom_core_translations = JeedomCoreTranslations()
+        self._core_root = Path.cwd()/CORE_ROOT
+        self._core_translations = Translations()
 
         self.__read_info_json()
-        self._jeedom_core_translations.parse()
 
     def start(self):
         self.get_previous_translations()
@@ -72,16 +69,16 @@ class TranslatePlugin():
                     tr = self._previous_translations.getTranslations(prompt.getText())
                     print(f"find previous translation for {prompt.getText()} => {tr}")
                     prompt.setTranslations(tr)
-                elif prompt.getText() in self._jeedom_core_translations.getTranslations():
-                    tr = self._jeedom_core_translations.getTranslations().getTranslations(prompt.getText())
-                    print(f"find previous translation for {prompt.getText()} => {tr}")
+                elif prompt.getText() in self._core_translations:
+                    tr = self._core_translations.getTranslations(prompt.getText())
+                    print(f"find core translation for {prompt.getText()} => {tr}")
                     prompt.setTranslation(tr)
 
 
     def get_previous_translations(self):
         print("Read existing translations file...")
         for language in LANGUAGES:
-            language_file = self.get_language_file(language)
+            language_file = self._plugin_root/f"core/i18n/{language}.json"
             if not language_file.exists():
                 continue
             try:
@@ -102,10 +99,22 @@ class TranslatePlugin():
                     self._previous_translations.add_translation(language, text, data[path][text])
         return True
 
-    def get_language_file(self, language: str):
-        return self._plugin_root/f"core/i18n/{language}.json"
+    def get_core_translations(self):
+        if not self._core_root.exists():
+            raise ValueError(f"Path {self._core_root.as_posix()} does not exists")
 
-    def write_translations(self, textes ="" ):
+        for language in LANGUAGES:
+            file = self._core_root/f"core/i18n/{language}.json"
+            if not file.exists():
+                print(f"file {file.as_posix()} not found !?")
+                continue
+
+            data = json.loads(file.read_text(encoding="UTF-8"))
+            for path in data:
+                for text in data[path]:
+                    self._core_translations.add_translation(language, text, data[path][text])
+
+    def write_translations(self):
         print("Ecriture du/des fichier(s) de traduction(s)...")
         for language in LANGUAGES:
             print(f"    Language: {language}...")
@@ -119,7 +128,7 @@ class TranslatePlugin():
                 result[path] = file.get_prompts_and_translation(language)
 
             print(f"Will dump {translation_file.as_posix()}")
-            translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace("/","\/"), encoding="UTF-8")
+            translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4), encoding="UTF-8")
 
 if __name__ == "__main__":
     TranslatePlugin().start()
