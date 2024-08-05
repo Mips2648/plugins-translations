@@ -20,7 +20,7 @@ class Translations():
             existing_translation = self._translation[text].getTranslation(language)
             if existing_translation == text :
                 # not actual translation yet, save it; could not happen in theory
-                self._translation[text].setTranslation(translation)
+                self._translation[text].setTranslation(language, translation)
             elif existing_translation != translation:
                 print(f"2 differents translations in previous files for '{text}': '{existing_translation}' <> '{translation}'")
             else:
