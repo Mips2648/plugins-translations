@@ -1,0 +1,21 @@
+name: get core translations
+
+on:
+  workflow_dispatch:
+
+jobs:
+  get:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Clone jeedom/core alpha
+        uses: GuillaumeFalourd/clone-github-repo-action@main
+        with:
+          owner: 'jeedom'
+          repository: 'core'
+          branch: 'alpha'
+          depth: 1
+      - name: Access cloned repository content
+        run: |
+          cd core/i18n
+          ls -la
