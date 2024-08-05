@@ -45,4 +45,4 @@ jobs:
           add-paths: core/i18n/*.json
           title: "Update translations"
           body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations) GitHub action"
-          commit-message: "Update translation done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations) GitHub action"
+          commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
