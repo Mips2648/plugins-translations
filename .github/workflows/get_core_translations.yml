@@ -17,5 +17,5 @@ jobs:
           depth: 1
       - name: Access cloned repository content
         run: |
-          cd core
+          cd core/core/i18n
           ls -la
