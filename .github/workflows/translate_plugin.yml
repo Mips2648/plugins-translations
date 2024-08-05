@@ -12,30 +12,32 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # Checks-out plugin repository under $GITHUB_WORKSPACE
-      - uses: actions/checkout@v4
+      - name: "Checkout plugin files"
+        uses: actions/checkout@v4
 
-      # Checks-out Mips2648/jeedom-translations to get python scripts
-      - uses: actions/checkout@v4
+      - name: "Checkout Mips2648/jeedom-translations sources"
+        uses: actions/checkout@v4
         with:
           repository: 'Mips2648/jeedom-translations'
           path: ${{ env.mips2648-translations }}
 
-      # Checks-out jeedom/core to get get use core translation as default
-      - uses: actions/checkout@v4
+      - name: "Checkout jeedom/core for default translations"
+        uses: actions/checkout@v4
         with:
           repository: 'jeedom/core'
           path: 'jeedom_core'
 
-      - uses: actions/setup-python@v5
+      - name: "Setup python 3.12"
+        uses: actions/setup-python@v5
         with:
           python-version: '3.12'
 
-      - name: Run script
+      - name: "Generate translations..."
         run: |
           python --version
           python ${{ env.mips2648-translations }}/src/translate_plugin.py
 
-      - name: Create Pull Request
+      - name: "Create Pull Request..."
         uses: peter-evans/create-pull-request@v6
         with:
           branch: "update-translations"
