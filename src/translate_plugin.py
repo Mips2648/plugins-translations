@@ -74,7 +74,7 @@ class TranslatePlugin():
                 elif prompt.getText() in self._core_translations:
                     tr = self._core_translations.getTranslations(prompt.getText())
                     print(f"find core translation for {prompt.getText()} => {tr}")
-                    prompt.setTranslation(tr)
+                    prompt.setTranslations(tr)
 
 
     def get_previous_translations(self):
