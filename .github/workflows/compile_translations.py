@@ -77,7 +77,7 @@ class CompileTranslations:
 
         translation_file = destination/f"{language}.json"
         print(f"Will dump {translation_file.as_posix()}")
-        translation_file.write_text(json.dumps(self._all_translations[language], ensure_ascii=False, sort_keys = True, indent= 4))
+        translation_file.write_text(json.dumps(self._all_translations[language], ensure_ascii=False, sort_keys = True, indent= 4), encoding="UTF-8")
 
 
 if __name__ == "__main__":
