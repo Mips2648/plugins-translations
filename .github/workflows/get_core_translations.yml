@@ -22,7 +22,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Compile all translations prompts
-        run: python .github/workflows/compile_translations.py --source /core/core/i18n --destination $GITHUB_WORKSPACE
+        run: python .github/workflows/compile_translations.py --source ./core/core/i18n --destination $GITHUB_WORKSPACE
 
       - name: "commit change"
         run: |
