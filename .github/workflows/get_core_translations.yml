@@ -21,6 +21,8 @@ jobs:
           cd core/core/i18n
           ls -la
       - uses: actions/checkout@v4
+        with:
+          path: 'translations'
 
       - name: Compile all translations prompts
         run: |
