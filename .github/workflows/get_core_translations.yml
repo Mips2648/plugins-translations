@@ -19,3 +19,15 @@ jobs:
         run: |
           cd core/core/i18n
           ls -la
+      - uses: actions/checkout@v4
+
+      - name: Compile all translations prompts
+        run: python .github/workflows/compile_translations.py --source core/core/i18n --destination $GITHUB_WORKSPACE
+
+      - name: "commit change"
+        run: |
+          cd $GITHUB_WORKSPACE
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git diff --quiet || (git add *.json && git commit -m 'update translation')
+          git push
