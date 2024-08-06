@@ -4,8 +4,8 @@ ES_ES = "es_ES"
 DE_DE = "de_DE"
 
 LANGUAGES = [
-    EN_US,
     FR_FR,
+    EN_US,
     ES_ES,
     DE_DE
 ]
