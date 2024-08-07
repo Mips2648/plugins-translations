@@ -59,7 +59,8 @@ jobs:
           body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
           commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
 
-      - name: "Create Pull Request toward central memory..."
+      - name: "Create Pull Request toward central memory from remote..."
+        if: github.repository != 'Mips2648/jeedom-plugins-translations'
         uses: peter-evans/create-pull-request@v6
         with:
           path: ${{ env.mips2648-plugins-translations }}
@@ -71,3 +72,16 @@ jobs:
           body: "Update memory translations from ${{ github.repository }} done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
           commit-message: "Update translation done by Mips2648/jeedom-translations workflow"
           push-to-fork: "${{ github.repository_owner }}/jeedom-plugins-translations"
+
+      - name: "Create Pull Request toward central memory from local..."
+        if: github.repository == 'Mips2648/jeedom-plugins-translations'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          path: ${{ env.mips2648-plugins-translations }}
+          branch: ${{ github.repository }}
+          delete-branch: true
+          add-paths: |
+            *.json
+          title: "Update translations"
+          body: "Update memory translations from ${{ github.repository }} done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
+          commit-message: "Update translation done by Mips2648/jeedom-translations workflow"
