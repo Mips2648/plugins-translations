@@ -3,6 +3,8 @@ name: Translate Plugin
 # Controls when the workflow will run
 on:
   workflow_call:
+  workflow_dispatch:
+
 
 env:
   mips2648-translations: "mips2648_translations"
