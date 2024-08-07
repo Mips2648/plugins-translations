@@ -61,6 +61,9 @@ jobs:
           body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
           commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
 
+      - name: Forking the repo
+        run: gh repo fork Mips2648/jeedom-plugins-translations --fork-jeedom-plugins-translations test-app-fork --clone --remote
+
       - name: "Create Pull Request toward central memory from remote..."
         uses: peter-evans/create-pull-request@v6
         with:
