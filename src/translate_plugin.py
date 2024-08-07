@@ -78,10 +78,10 @@ class TranslatePlugin():
         print("Find existing translations...")
         for file in self._files.values():
             for prompt in file.get_prompts().values():
-                if prompt.getText() in self._existing_translations:
-                    tr = self._existing_translations.getTranslations(prompt.getText())
-                    print(f"find translation for {prompt.getText()} => {tr}")
-                    prompt.setTranslations(tr)
+                if prompt.get_text() in self._existing_translations:
+                    tr = self._existing_translations.get_translations(prompt.get_text())
+                    print(f"find translation for {prompt.get_text()} => {tr}")
+                    prompt.set_translations(tr)
 
 
     def get_plugin_translations(self):
@@ -136,7 +136,7 @@ class TranslatePlugin():
             translation_file = root/f"{language}.json"
             result = {}
             for path, file in self._files.items():
-                result[path] = [[prompt.getText(), prompt.getTranslation(language)] for prompt in file.get_prompts().values()]
+                result[path] = [[prompt.get_text(), prompt.get_translation(language)] for prompt in file.get_prompts().values()]
 
             print(f"Will dump {translation_file.as_posix()}")
             translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
