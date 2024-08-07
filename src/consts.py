@@ -11,6 +11,7 @@ LANGUAGES = [
 ]
 
 PLUGIN_DIRS = ['core', 'desktop', 'plugin_info']
+FILE_EXTS = ['.php', '.js', '.json']
 
 PLUGIN_INFO_JSON = 'plugin_info/info.json'
 

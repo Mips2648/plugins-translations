@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from source_file import SourceFile
-from consts import CORE_ROOT, LANGUAGES, PLUGIN_DIRS, PLUGIN_INFO_JSON
+from consts import CORE_ROOT, FILE_EXTS, LANGUAGES, PLUGIN_DIRS, PLUGIN_INFO_JSON
 from translations import Translations
 
 class TranslatePlugin():
@@ -60,14 +60,13 @@ class TranslatePlugin():
                     #     if fnmatch.fnmatch(dirname, d):
                     #         dirs.remove(dirname)
 
-                for fileName in files:
+                for file in files:
                     # for f in excludes:
                     #     if fnmatch.fnmatch(fileName, f):
                     #         continue
-                    if fileName[-4:] == ".php" or fileName[-3:] == ".js":
-                    #   or fileName[-5:] == ".json"
-                    #   or fileName[-5:] == ".html"):
-                        absolute_file_path = root/fileName
+                    filename = Path(file)
+                    if filename.suffix in FILE_EXTS:
+                        absolute_file_path = root/filename
                         jeedom_file_path = absolute_file_path.relative_to(self._plugin_root)
                         jeedom_file_path = (f"plugins/{self._plugin_id}"/jeedom_file_path).as_posix()
                         print(f"    {jeedom_file_path}...")
