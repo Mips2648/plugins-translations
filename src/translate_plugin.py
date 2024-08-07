@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from source_file import SourceFile
-from consts import CORE_ROOT, FILE_EXTS, LANGUAGES, PLUGIN_DIRS, PLUGIN_INFO_JSON
+from consts import CORE_ROOT, FILE_EXTS, LANGUAGES, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON
 from translations import Translations
 
 class TranslatePlugin():
@@ -26,7 +26,8 @@ class TranslatePlugin():
         self.find_prompts_in_all_files()
         self.do_translate()
 
-        self.write_translations()
+        self.write_plugin_translations()
+        self.write_memory_translations()
 
         self.__write_info_json()
 
@@ -91,7 +92,7 @@ class TranslatePlugin():
     def get_core_translations(self):
         print("Read core translations file...")
         if not self._core_root.exists():
-            raise ValueError(f"Path {self._core_root.as_posix()} does not exists")
+            raise RuntimeError(f"Path {self._core_root.as_posix()} does not exists")
 
         self.get_translations_from_json_files(self._core_root)
 
@@ -108,13 +109,15 @@ class TranslatePlugin():
                 for text in data[path]:
                     self._existing_translations.add_translation(language, text, data[path][text])
 
-    def write_translations(self):
+    def write_plugin_translations(self):
         print("Ecriture du/des fichier(s) de traduction(s)...")
+
+        translation_path = self._plugin_root/"core/i18n"
+        translation_path.mkdir(parents=True, exist_ok=True)
+
         for language in LANGUAGES:
             print(f"    Language: {language}...")
 
-            translation_path = self._plugin_root/"core/i18n"
-            translation_path.mkdir(parents=True, exist_ok=True)
             translation_file = translation_path/f"{language}.json"
 
             result = {}
@@ -123,6 +126,21 @@ class TranslatePlugin():
 
             print(f"Will dump {translation_file.as_posix()}")
             translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
+
+    def write_memory_translations(self):
+        root = Path.cwd()/MEMORY_ROOT
+        if not root.exists():
+            raise RuntimeError(f"Path {root.as_posix()} does not exists")
+
+        for language in LANGUAGES:
+            translation_file = root/f"{language}.json"
+            result = {}
+            for path, file in self._files.items():
+                result[path] = [[prompt.getText(), prompt.getTranslation(language)] for prompt in file.get_prompts().values()]
+
+            print(f"Will dump {translation_file.as_posix()}")
+            translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
+
 
 if __name__ == "__main__":
     TranslatePlugin().start()

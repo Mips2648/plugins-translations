@@ -7,6 +7,7 @@ on:
 env:
   mips2648-translations: "mips2648_translations"
   pr-branch-name: "translations"
+  mips2648-plugins-translations: "mips2648_plugins_translations"
 
 jobs:
   translate:
@@ -21,6 +22,12 @@ jobs:
         with:
           repository: 'Mips2648/jeedom-translations'
           path: ${{ env.mips2648-translations }}
+
+      - name: "Checkout Mips2648/jeedom-plugins-translations for memory translations"
+        uses: actions/checkout@v4
+        with:
+          repository: 'Mips2648/jeedom-plugins-translations'
+          path: ${{ env.mips2648-plugins-translations }}
 
       - name: "Checkout jeedom/core for default translations"
         uses: actions/checkout@v4
@@ -40,7 +47,7 @@ jobs:
           git branch ${{ env.pr-branch-name }}
           python ${{ env.mips2648-translations }}/src/translate_plugin.py
 
-      - name: "Create Pull Request..."
+      - name: "Create Pull Request toward plugin..."
         uses: peter-evans/create-pull-request@v6
         with:
           branch: ${{ env.pr-branch-name }}
@@ -49,5 +56,18 @@ jobs:
             core/i18n/*.json
             plugin_info/info.json
           title: "Update translations"
-          body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations) GitHub action"
+          body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
           commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
+
+      - name: "Create Pull Request toward central memory..."
+        uses: peter-evans/create-pull-request@v6
+        with:
+          path: ${{ env.mips2648-plugins-translations }}
+          branch: ${{ github.repository }}
+          delete-branch: true
+          add-paths: |
+            *.json
+          title: "Update translations"
+          body: "Update memory translations from ${{ github.repository }} done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
+          commit-message: "Update translation done by Mips2648/jeedom-translations workflow"
+          push-to-fork: "${{ github.repository_owner }}/jeedom-plugins-translations"

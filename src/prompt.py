@@ -14,7 +14,7 @@ class Prompt():
         self._translations[language] = translation
 
     def getTranslation(self, language: str):
-        return self._translations[language] if language in self._translations else None
+        return self._translations[language] if language in self._translations else ''
 
     def setTranslations(self, translations: dict[str, str]):
         self._translations = translations

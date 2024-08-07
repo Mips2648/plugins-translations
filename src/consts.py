@@ -16,3 +16,4 @@ FILE_EXTS = ['.php', '.js', '.json']
 PLUGIN_INFO_JSON = 'plugin_info/info.json'
 
 CORE_ROOT = 'jeedom_core'
+MEMORY_ROOT = 'mips2648_plugins_translations'
