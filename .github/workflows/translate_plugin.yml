@@ -62,7 +62,6 @@ jobs:
           commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
 
       - name: "Create Pull Request toward central memory from remote..."
-        if: ${{ github.repository_owner != 'Mips2648' }}
         uses: peter-evans/create-pull-request@v6
         with:
           path: ${{ env.mips2648-plugins-translations }}
