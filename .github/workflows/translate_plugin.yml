@@ -63,6 +63,8 @@ jobs:
 
       - name: Forking the repo
         run: gh repo fork Mips2648/jeedom-plugins-translations --fork-name fork-jeedom-plugins-translations --clone --remote
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "Create Pull Request toward central memory from remote..."
         uses: peter-evans/create-pull-request@v6
