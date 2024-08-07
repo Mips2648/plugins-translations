@@ -20,7 +20,8 @@ class Translations():
             # not yet translate, save this one
             self._translation[text].set_translation(language, new_translation)
         elif self._translation[text].get_translation(language) != new_translation:
-            print(f"2 differents translations for '{text}', keeping first one: '{self._translation[text].get_translation(language)}' <> '{new_translation}'")
+            pass
+            # print(f"2 differents translations for '{text}', keeping first one: '{self._translation[text].get_translation(language)}' <> '{new_translation}'")
         else:
             pass #all fine, we found twice the same text and same translation
 
