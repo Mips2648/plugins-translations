@@ -7,11 +7,14 @@ class Prompt():
     def getText(self):
         return self._text
 
+    def hasTranslation(self, language: str):
+        return language in self._translations
+
     def setTranslation(self, language: str, translation: str):
         self._translations[language] = translation
 
     def getTranslation(self, language: str):
-        return self._translations[language] if language in self._translations else self._text
+        return self._translations[language] if language in self._translations else None
 
     def setTranslations(self, translations: dict[str, str]):
         self._translations = translations

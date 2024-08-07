@@ -49,6 +49,7 @@ class SourceFile(object):
     def get_prompts_and_translation(self, language) -> dict[str, str]:
         result = {}
         for prompt in self._prompts.values():
-            result[prompt.getText()] = prompt.getTranslation(language)
+            if prompt.hasTranslation():
+                result[prompt.getText()] = prompt.getTranslation(language)
 
         return result
