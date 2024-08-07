@@ -80,7 +80,7 @@ class TranslatePlugin():
             for prompt in file.get_prompts().values():
                 if prompt.get_text() in self._existing_translations:
                     tr = self._existing_translations.get_translations(prompt.get_text())
-                    print(f"find translation for {prompt.get_text()} => {tr}")
+                    # print(f"find translation for {prompt.get_text()} => {tr}")
                     prompt.set_translations(tr)
 
 
