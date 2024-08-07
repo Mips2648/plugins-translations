@@ -130,7 +130,8 @@ class TranslatePlugin():
     def write_memory_translations(self):
         root = Path.cwd()/MEMORY_ROOT
         if not root.exists():
-            raise RuntimeError(f"Path {root.as_posix()} does not exists")
+            return
+            # raise RuntimeError(f"Path {root.as_posix()} does not exists")
 
         for language in LANGUAGES:
             translation_file = root/f"{language}.json"
