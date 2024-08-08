@@ -58,7 +58,7 @@ runs:
       uses: peter-evans/create-pull-request@v6
       with:
         path: 'plugins_translations_memory'
-        branch: ${{ github.repository }}
+        branch: ${{ github.run_id }}
         delete-branch: true
         add-paths: |
           *.json
