@@ -2,9 +2,10 @@ name: Translate Plugin
 Description: 'Action to translate a Jeedom Plugin'
 
 inputs:
-  token:  # id of input
-    description: 'Personal access token to push to transactions memory'
-    required: true
+  deepl_api_key:  # id of input
+    description: 'deepl API KEY for automatic translation'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -44,7 +45,7 @@ runs:
       run: |
         ls -la
         python --version
-        python plugins_translations/src/translate_plugin.py
+        python plugins_translations/src/translate_plugin.py --deepl_api_key ${{ inputs.deepl_api_key }}
 
     - name: "Create Pull Request to plugin..."
       uses: peter-evans/create-pull-request@v6
@@ -58,17 +59,3 @@ runs:
         title: "Update translations"
         body: "Automated translations done by [jeedomThirdPartyDevs/plugins-translations workflow](https://github.com/jeedomThirdPartyDevs/plugins-translations)"
         commit-message: "Auto update translation done by jeedomThirdPartyDevs/plugins-translations workflow"
-
-    - name: "Create Pull Request to central memory from remote..."
-      uses: peter-evans/create-pull-request@v6
-      with:
-        token: ${{ inputs.token }}
-        path: 'plugins_translations_memory'
-        branch: ${{ github.run_id }}
-        delete-branch: true
-        add-paths: |
-          *.json
-        title: "Update translations"
-        body: "Update memory translations from ${{ github.repository }} done by [jeedomThirdPartyDevs/plugins-translations workflow](https://github.com/jeedomThirdPartyDevs/plugins-translations)"
-        commit-message: "Update translation done by jeedomThirdPartyDevs/plugins-translations workflow"
-        push-to-fork: "${{ github.repository_owner }}/plugins-translations-memory"

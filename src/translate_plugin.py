@@ -1,5 +1,8 @@
+import argparse
 import json
 from pathlib import Path
+
+import deepl
 
 from source_file import SourceFile
 from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
@@ -18,6 +21,14 @@ class TranslatePlugin():
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()
 
+        self.__translator: deepl.Translator = None
+
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--deepl_api_key", type=str, default='')
+        args = parser.parse_args()
+        if args.deepl_api_key != '':
+            self.__translator = deepl.Translator(args.deepl_api_key)
+
         self.__read_info_json()
 
     def start(self):
@@ -27,7 +38,7 @@ class TranslatePlugin():
         self.do_translate()
 
         self.write_plugin_translations()
-        self.write_memory_translations()
+        # self.write_memory_translations()
 
         self.__write_info_json()
 
@@ -84,6 +95,15 @@ class TranslatePlugin():
                     tr = self._existing_translations.get_translations(prompt.get_text())
                     # print(f"find translation for {prompt.get_text()} => {tr}")
                     prompt.set_translations(tr)
+
+                if self.__translator is not None:
+                    for language in LANGUAGES:
+                        if language==FR_FR:
+                            continue
+                        if prompt.get_translation(language) == '':
+                            result = self.__translator.translate_text(prompt.get_text(), source_lang=FR_FR, target_lang=language)
+                            prompt.set_translation(language, result.text)
+
 
 
     def get_plugin_translations(self):
