@@ -16,17 +16,11 @@ runs:
       with:
         path: 'plugin'
 
-    - name: "Checkout jeedomThirdPartyDevs/plugins-translations sources"
+    - name: "Checkout Mips2648/plugins-translations sources"
       uses: actions/checkout@v4
       with:
-        repository: 'jeedomThirdPartyDevs/plugins-translations'
+        repository: 'Mips2648/plugins-translations'
         path: 'plugins_translations'
-
-    - name: "Checkout jeedomThirdPartyDevs/plugins-translations-memory for memory translations"
-      uses: actions/checkout@v4
-      with:
-        repository: 'jeedomThirdPartyDevs/plugins-translations-memory'
-        path: 'plugins_translations_memory'
 
     - name: "Checkout jeedom/core for default translations"
       uses: actions/checkout@v4
@@ -59,5 +53,5 @@ runs:
           core/i18n/*.json
           plugin_info/info.json
         title: "Update translations"
-        body: "Automated translations done by [jeedomThirdPartyDevs/plugins-translations workflow](https://github.com/jeedomThirdPartyDevs/plugins-translations)"
-        commit-message: "Auto update translation done by jeedomThirdPartyDevs/plugins-translations workflow"
+        body: "Automated translations done by [Mips2648/plugins-translations workflow](https://github.com/Mips2648/plugins-translations)"
+        commit-message: "Auto update translation done by Mips2648/plugins-translations workflow"

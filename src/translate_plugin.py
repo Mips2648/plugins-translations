@@ -5,7 +5,7 @@ from pathlib import Path
 import deepl
 
 from source_file import SourceFile
-from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
@@ -38,7 +38,6 @@ class TranslatePlugin():
         self.do_translate()
 
         self.write_plugin_translations()
-        # self.write_memory_translations()
 
         self.__write_info_json()
 
@@ -146,25 +145,6 @@ class TranslatePlugin():
 
             print(f"Will dump {translation_file.as_posix()}")
             translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
-
-    def write_memory_translations(self):
-        print("Ecriture du/des fichier(s) de mémoires...")
-
-        root = Path.cwd()/MEMORY_ROOT
-        if not root.exists():
-            return
-            # raise RuntimeError(f"Path {root.as_posix()} does not exists")
-
-        for language in LANGUAGES:
-            translation_file = root/f"{language}.json"
-            result = {}
-            for path, file in self._files.items():
-                for prompt in file.get_prompts().values():
-                    result[prompt.get_text()] = prompt.get_translation(language) if language != FR_FR else prompt.get_text()
-
-            print(f"Will dump {translation_file.as_posix()}")
-            translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
-
 
 if __name__ == "__main__":
     TranslatePlugin().start()
