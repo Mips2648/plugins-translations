@@ -5,7 +5,7 @@ from pathlib import Path
 import deepl
 
 from source_file import SourceFile
-from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
@@ -101,7 +101,7 @@ class TranslatePlugin():
                         if language==FR_FR:
                             continue
                         if prompt.get_translation(language) == '':
-                            result = self.__translator.translate_text(prompt.get_text(), source_lang=FR_FR, target_lang=language)
+                            result = self.__translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language])
                             prompt.set_translation(language, result.text)
 
 

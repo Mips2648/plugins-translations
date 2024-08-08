@@ -18,3 +18,10 @@ PLUGIN_INFO_JSON = 'plugin_info/info.json'
 PLUGIN_ROOT = 'plugin'
 CORE_ROOT = 'jeedom_core'
 MEMORY_ROOT = 'plugins_translations_memory'
+
+LANGUAGES_TO_DEEPL = {
+    FR_FR: 'FR',
+    EN_US: 'EN-US',
+    ES_ES: 'ES',
+    DE_DE: 'DE'
+}
