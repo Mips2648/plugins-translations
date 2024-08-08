@@ -47,7 +47,7 @@ runs:
       run: |
         ls -la
         python --version
-        python plugins_translations/src/translate_plugin.py ${{ inputs.deepl_api_key != '' && '--deepl_api_key ${{ inputs.deepl_api_key }}' || ''}}
+        python plugins_translations/src/translate_plugin.py ${{ inputs.deepl_api_key != '' && '--deepl_api_key ' ${{ inputs.deepl_api_key }} || ''}}
 
     - name: "Create Pull Request to plugin..."
       uses: peter-evans/create-pull-request@v6
