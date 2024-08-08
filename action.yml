@@ -40,6 +40,7 @@ runs:
     - name: "Generate translations..."
       shell: bash
       run: |
+        ls -la
         python --version
         git branch ${{ env.pr-branch-name }}
         python ${{ env.mips2648-translations }}/src/translate_plugin.py
