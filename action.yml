@@ -1,11 +1,6 @@
 name: Translate Plugin
 Description: 'Action to translate a Jeedom Plugin'
 
-env:
-  mips2648-translations: "mips2648_translations"
-  pr-branch-name: "translations"
-  mips2648-plugins-translations: "mips2648_plugins_translations"
-
 runs:
   using: "composite"
   steps:
@@ -17,13 +12,13 @@ runs:
       uses: actions/checkout@v4
       with:
         repository: 'Mips2648/jeedom-translations'
-        path: ${{ env.mips2648-translations }}
+        path: 'mips2648_translations'
 
     - name: "Checkout Mips2648/jeedom-plugins-translations for memory translations"
       uses: actions/checkout@v4
       with:
         repository: 'Mips2648/jeedom-plugins-translations'
-        path: ${{ env.mips2648-plugins-translations }}
+        path: 'mips2648_plugins_translations'
 
     - name: "Checkout jeedom/core for default translations"
       uses: actions/checkout@v4
@@ -42,13 +37,13 @@ runs:
       run: |
         ls -la
         python --version
-        git branch ${{ env.pr-branch-name }}
-        python ${{ env.mips2648-translations }}/src/translate_plugin.py
+        git branch translations
+        python mips2648_translations/src/translate_plugin.py
 
     - name: "Create Pull Request toward plugin..."
       uses: peter-evans/create-pull-request@v6
       with:
-        branch: ${{ env.pr-branch-name }}
+        branch: translations
         delete-branch: true
         add-paths: |
           core/i18n/*.json
