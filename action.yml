@@ -44,6 +44,7 @@ runs:
     - name: "Create Pull Request to plugin..."
       uses: peter-evans/create-pull-request@v6
       with:
+        path: 'plugin'
         branch: translations
         delete-branch: true
         add-paths: |
