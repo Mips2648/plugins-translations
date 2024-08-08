@@ -38,6 +38,7 @@ runs:
         python-version: '3.12'
 
     - name: "Generate translations..."
+      shell: bash
       run: |
         python --version
         git branch ${{ env.pr-branch-name }}
