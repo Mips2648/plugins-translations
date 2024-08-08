@@ -118,8 +118,6 @@ class TranslatePlugin():
         translation_path.mkdir(parents=True, exist_ok=True)
 
         for language in LANGUAGES:
-            print(f"    Language: {language}...")
-
             translation_file = translation_path/f"{language}.json"
 
             result = {}
@@ -130,6 +128,8 @@ class TranslatePlugin():
             translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
 
     def write_memory_translations(self):
+        print("Ecriture du/des fichier(s) de mémoires...")
+
         root = Path.cwd()/MEMORY_ROOT
         if not root.exists():
             return
