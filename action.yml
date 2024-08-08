@@ -7,18 +7,20 @@ runs:
     # Checks-out plugin repository under $GITHUB_WORKSPACE
     - name: "Checkout plugin files"
       uses: actions/checkout@v4
+      with:
+        path: 'plugin'
 
-    - name: "Checkout Mips2648/jeedom-translations sources"
+    - name: "Checkout jeedomThirdPartyDevs/plugins-translations sources"
       uses: actions/checkout@v4
       with:
-        repository: 'Mips2648/jeedom-translations'
-        path: 'mips2648_translations'
+        repository: 'jeedomThirdPartyDevs/plugins-translations'
+        path: 'plugins_translations'
 
-    - name: "Checkout Mips2648/jeedom-plugins-translations for memory translations"
+    - name: "Checkout jeedomThirdPartyDevs/plugins-translations-memory for memory translations"
       uses: actions/checkout@v4
       with:
-        repository: 'Mips2648/jeedom-plugins-translations'
-        path: 'mips2648_plugins_translations'
+        repository: 'jeedomThirdPartyDevs/plugins-translations-memory'
+        path: 'plugins_translations_memory'
 
     - name: "Checkout jeedom/core for default translations"
       uses: actions/checkout@v4
@@ -38,9 +40,9 @@ runs:
         ls -la
         python --version
         git branch translations
-        python mips2648_translations/src/translate_plugin.py
+        python plugins_translations/src/translate_plugin.py
 
-    - name: "Create Pull Request toward plugin..."
+    - name: "Create Pull Request to plugin..."
       uses: peter-evans/create-pull-request@v6
       with:
         branch: translations
@@ -49,5 +51,18 @@ runs:
           core/i18n/*.json
           plugin_info/info.json
         title: "Update translations"
-        body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
-        commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
+        body: "Automated translations done by [jeedomThirdPartyDevs/plugins-translations workflow](https://github.com/jeedomThirdPartyDevs/plugins-translations)"
+        commit-message: "Auto update translation done by jeedomThirdPartyDevs/plugins-translations workflow"
+
+    - name: "Create Pull Request to central memory from remote..."
+      uses: peter-evans/create-pull-request@v6
+      with:
+        path: 'plugins_translations_memory'
+        branch: ${{ github.repository }}
+        delete-branch: true
+        add-paths: |
+          *.json
+        title: "Update translations"
+        body: "Update memory translations from ${{ github.repository }} done by [jeedomThirdPartyDevs/plugins-translations workflow](https://github.com/jeedomThirdPartyDevs/plugins-translations)"
+        commit-message: "Update translation done by jeedomThirdPartyDevs/plugins-translations workflow"
+        push-to-fork: "${{ github.repository_owner }}/plugins-translations-memory"

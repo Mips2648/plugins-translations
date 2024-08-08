@@ -2,13 +2,13 @@ import json
 from pathlib import Path
 
 from source_file import SourceFile
-from consts import CORE_ROOT, FILE_EXTS, LANGUAGES, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON
+from consts import CORE_ROOT, FILE_EXTS, LANGUAGES, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
 
     def __init__(self) -> None:
-        self._plugin_root = Path.cwd()
+        self._plugin_root = Path.cwd()/PLUGIN_ROOT
         self._plugin_id: str
         self._plugin_name: str
 
@@ -62,6 +62,8 @@ class TranslatePlugin():
                     #         dirs.remove(dirname)
 
                 for file in files:
+                    if file == 'info.json':
+                        continue
                     # for f in excludes:
                     #     if fnmatch.fnmatch(fileName, f):
                     #         continue
