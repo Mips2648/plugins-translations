@@ -17,4 +17,4 @@ PLUGIN_INFO_JSON = 'plugin_info/info.json'
 
 PLUGIN_ROOT = 'plugin'
 CORE_ROOT = 'jeedom_core'
-MEMORY_ROOT = 'mips2648_plugins_translations'
+MEMORY_ROOT = 'plugins_translations_memory'
