@@ -1,6 +1,11 @@
 name: Translate Plugin
 Description: 'Action to translate a Jeedom Plugin'
 
+inputs:
+  token:  # id of input
+    description: 'Personal access token to push to transactions memory'
+    required: true
+
 runs:
   using: "composite"
   steps:
@@ -57,6 +62,7 @@ runs:
     - name: "Create Pull Request to central memory from remote..."
       uses: peter-evans/create-pull-request@v6
       with:
+        token: ${{ inputs.token }}
         path: 'plugins_translations_memory'
         branch: ${{ github.run_id }}
         delete-branch: true
