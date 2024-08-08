@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 from source_file import SourceFile
-from consts import CORE_ROOT, FILE_EXTS, LANGUAGES, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, MEMORY_ROOT, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
@@ -140,7 +140,7 @@ class TranslatePlugin():
             result = {}
             for path, file in self._files.items():
                 for prompt in file.get_prompts().values():
-                    result[prompt.get_text()] = prompt.get_translation(language)
+                    result[prompt.get_text()] = prompt.get_translation(language) if language != FR_FR else prompt.get_text()
 
             print(f"Will dump {translation_file.as_posix()}")
             translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
