@@ -39,7 +39,6 @@ runs:
       run: |
         ls -la
         python --version
-        git branch translations
         python plugins_translations/src/translate_plugin.py
 
     - name: "Create Pull Request to plugin..."
