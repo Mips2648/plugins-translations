@@ -1,0 +1,62 @@
+name: Translate Plugin
+Description: 'Action to translate a Jeedom Plugin'
+
+# Controls when the workflow will run
+on:
+  workflow_call:
+  workflow_dispatch:
+
+
+env:
+  mips2648-translations: "mips2648_translations"
+  pr-branch-name: "translations"
+  mips2648-plugins-translations: "mips2648_plugins_translations"
+
+runs:
+  using: "composite"
+  steps:
+    # Checks-out plugin repository under $GITHUB_WORKSPACE
+    - name: "Checkout plugin files"
+      uses: actions/checkout@v4
+
+    - name: "Checkout Mips2648/jeedom-translations sources"
+      uses: actions/checkout@v4
+      with:
+        repository: 'Mips2648/jeedom-translations'
+        path: ${{ env.mips2648-translations }}
+
+    - name: "Checkout Mips2648/jeedom-plugins-translations for memory translations"
+      uses: actions/checkout@v4
+      with:
+        repository: 'Mips2648/jeedom-plugins-translations'
+        path: ${{ env.mips2648-plugins-translations }}
+
+    - name: "Checkout jeedom/core for default translations"
+      uses: actions/checkout@v4
+      with:
+        repository: 'jeedom/core'
+        ref: 'alpha'
+        path: 'jeedom_core'
+
+    - name: "Setup python 3.12"
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.12'
+
+    - name: "Generate translations..."
+      run: |
+        python --version
+        git branch ${{ env.pr-branch-name }}
+        python ${{ env.mips2648-translations }}/src/translate_plugin.py
+
+    - name: "Create Pull Request toward plugin..."
+      uses: peter-evans/create-pull-request@v6
+      with:
+        branch: ${{ env.pr-branch-name }}
+        delete-branch: true
+        add-paths: |
+          core/i18n/*.json
+          plugin_info/info.json
+        title: "Update translations"
+        body: "Automated translations done by [Mips2648/jeedom-translations workflow](https://github.com/Mips2648/jeedom-translations)"
+        commit-message: "Auto update translation done by Mips2648/jeedom-translations workflow"
