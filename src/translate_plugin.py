@@ -105,9 +105,12 @@ class TranslatePlugin():
 
                 if self.__translator is not None:
                     for language in LANGUAGES:
+                        print(f"deepl translate for {language}")
                         if language==FR_FR:
                             continue
                         if prompt.get_translation(language) == '':
+                            if self.__glossary[language] is not None:
+                                print(f"use glossary {self.__glossary[language].glossary_id}")
                             result = self.__translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language],
                                                                       preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary[language])
                             prompt.set_translation(language, result.text)
