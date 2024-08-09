@@ -34,10 +34,22 @@ class TranslatePlugin():
                 self.__glossary[language] = None
 
             self.__glossary[EN_US] = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[EN_US], entries={
-                'commande': 'order'
+                'commande': 'command',
+                'type': 'type'
             })
 
         self.__read_info_json()
+
+    def __del__(self):
+        if self.__translator is None:
+            return
+
+        for language in LANGUAGES:
+            if self.__glossary[language] is None:
+                continue
+
+            self.__translator.delete_glossary(self.__glossary[language])
+
 
     def start(self):
         self.get_plugin_translations()
