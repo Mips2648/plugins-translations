@@ -5,7 +5,7 @@ from pathlib import Path
 import deepl
 
 from source_file import SourceFile
-from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import CORE_ROOT, EN_US, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
@@ -22,12 +22,16 @@ class TranslatePlugin():
         self._core_translations = Translations()
 
         self.__translator: deepl.Translator = None
+        self.__glossary: deepl.GlossaryInfo = None
 
         parser = argparse.ArgumentParser()
         parser.add_argument("--deepl_api_key", type=str, default='')
         args = parser.parse_args()
         if args.deepl_api_key != '':
             self.__translator = deepl.Translator(args.deepl_api_key)
+            self.__glossary = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[EN_US], entries={
+                'commande': 'order'
+            })
 
         self.__read_info_json()
 
@@ -100,10 +104,9 @@ class TranslatePlugin():
                         if language==FR_FR:
                             continue
                         if prompt.get_translation(language) == '':
-                            result = self.__translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language])
+                            result = self.__translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language],
+                                                                      preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary)
                             prompt.set_translation(language, result.text)
-
-
 
     def get_plugin_translations(self):
         print("Read plugin translations file...")
