@@ -5,7 +5,7 @@ from pathlib import Path
 import deepl
 
 from source_file import SourceFile
-from consts import CORE_ROOT, EN_US, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
@@ -30,13 +30,16 @@ class TranslatePlugin():
         if args.deepl_api_key != '':
             self.__translator = deepl.Translator(args.deepl_api_key)
 
-            for language in LANGUAGES:
-                self.__glossary[language] = None
+            fileDir = Path(__file__).parent
 
-            self.__glossary[EN_US] = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[EN_US], entries={
-                'commande': 'command',
-                'type': 'type'
-            })
+            for language in LANGUAGES:
+                glossary = fileDir/f"{language}.glossary.json"
+                if not glossary.exists():
+                    self.__glossary[language] = None
+                else:
+                    entries = json.loads(glossary.read_text(encoding="UTF-8"))
+                    print(f"Create glossary for {language}")
+                    self.__glossary[language] = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language], entries=entries)
 
         self.__read_info_json()
 
