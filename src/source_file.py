@@ -15,12 +15,12 @@ class SourceFile(object):
     def get_prompts(self):
         return self._prompts
 
-    def __add_prompt(self, text: str):
+    def _add_prompt(self, text: str):
         if text not in self._prompts:
             self._prompts[text] = Prompt(text)
 
     def search_prompts(self):
-        patern___ = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<texte>.*?)(?P=delim))\s*,\s*\S+\s*\)')
+        pattern = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<texte>.*?)(?P=delim))\s*,\s*\S+\s*\)')
         try:
             content = self._file.read_text(encoding="UTF-8")
         except Exception as ex:
@@ -30,12 +30,12 @@ class SourceFile(object):
 
         for txt in re.findall("{{(.*?)}}", content):
             if len(txt) != 0:
-                self.__add_prompt(txt)
+                self._add_prompt(txt)
             else:
                 Warning (f"ATTENTION, il y a un texte de longueur 0 dans le fichier <{self._file.as_posix()}>")
 
         if self._file.suffix == ".php":
-            for match in patern___.finditer(content):
+            for match in pattern.finditer(content):
                 text = match.group('texte')
                 delim = match.group('delim')
                 regex = r'(^' + delim + r')|([^\\]' + delim + r')'
@@ -44,7 +44,7 @@ class SourceFile(object):
                     print(f"      Fichier: {self._file.as_uri()}")
                     print(f"      texte  : {text}")
                 else:
-                    self.__add_prompt(text)
+                    self._add_prompt(text)
 
     def get_prompts_and_translation(self, language) -> dict[str, str]:
         result = {}
