@@ -45,10 +45,10 @@ class TranslatePlugin():
     def __parse_args(self, args: Sequence[str] | None = None):
         parser = argparse.ArgumentParser()
         parser.add_argument("--deepl_api_key", type=str, default='')
-        parser.add_argument("--include_prompts_without_translation", type=bool, default=False)
+        parser.add_argument("--include_prompts_without_translation", type=str, default='false')
         args = parser.parse_args()
         self.__deepl_api_key = args.deepl_api_key if args.deepl_api_key != '' else None
-        self.__include_prompts_without_translation = (args.include_prompts_without_translation != 'false')
+        self.__include_prompts_without_translation = (str(args.include_prompts_without_translation) != 'false')
 
         if self.__include_prompts_without_translation:
             print("prompts without translation will be included !")
