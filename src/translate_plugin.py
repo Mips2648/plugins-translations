@@ -79,7 +79,10 @@ class TranslatePlugin():
             raise RuntimeError("Missing info.json file")
 
         data = json.loads(info_json.read_text(encoding="UTF-8"))
-        data['language'] = LANGUAGES
+        if 'language' in data:
+            # rename key language by languages to match specs
+            data = {"languages" if k == 'language' else k:v for k,v in data.items()}
+        data['languages'] = LANGUAGES
         info_json.write_text(json.dumps(data, ensure_ascii=False, indent= '\t'), encoding="UTF-8")
 
     def find_prompts_in_all_files(self):
