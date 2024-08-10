@@ -4,8 +4,14 @@ Description: 'Action to translate a Jeedom Plugin'
 inputs:
   deepl_api_key:  # id of input
     description: 'deepl API KEY for automatic translation'
+    type: string
     required: false
     default: ''
+  include_prompts_without_translation:
+    description: 'prompts without translation will be included in language files if true'
+    type: boolean
+    required: false
+    default: false
 
 runs:
   using: "composite"
@@ -41,7 +47,9 @@ runs:
       run: |
         ls -la
         python --version
-        python plugins_translations/src/translate_plugin.py ${{ inputs.deepl_api_key != '' && format('--deepl_api_key {0}', inputs.deepl_api_key) || ''}}
+        python plugins_translations/src/translate_plugin.py \
+          --include_prompts_without_translation ${{ inputs.include_prompts_without_translation }} \
+          ${{ inputs.deepl_api_key != '' && format('--deepl_api_key {0}', inputs.deepl_api_key) || ''}}
 
     - name: "Create Pull Request to plugin..."
       uses: peter-evans/create-pull-request@v6

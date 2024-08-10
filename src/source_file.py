@@ -46,10 +46,10 @@ class SourceFile(object):
                 else:
                     self._add_prompt(text)
 
-    def get_prompts_and_translation(self, language) -> dict[str, str]:
+    def get_prompts_and_translation(self, language: str, include_empty_translation: bool = False) -> dict[str, str]:
         result = {}
         for prompt in self._prompts.values():
-            # if prompt.has_translation(language):
-            result[prompt.get_text()] = prompt.get_translation(language)
+            if include_empty_translation or prompt.has_translation(language):
+                result[prompt.get_text()] = prompt.get_translation(language)
 
         return result

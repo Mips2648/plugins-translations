@@ -19,6 +19,7 @@ class TranslatePlugin():
         self._files: dict[str, SourceFile] = {}
         self._existing_translations = Translations()
         self._languages_to_translate = LANGUAGES
+        self.__include_prompts_without_translation: bool = False
 
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()
@@ -44,8 +45,10 @@ class TranslatePlugin():
     def __parse_args(self, args: Sequence[str] | None = None):
         parser = argparse.ArgumentParser()
         parser.add_argument("--deepl_api_key", type=str, default='')
+        parser.add_argument("--include_prompts_without_translation", type=bool, default=False)
         args = parser.parse_args()
         self.__deepl_api_key = args.deepl_api_key if args.deepl_api_key != '' else None
+        self.__include_prompts_without_translation = args.include_prompts_without_translation
 
     def start(self):
         self.get_plugin_translations()
@@ -183,7 +186,7 @@ class TranslatePlugin():
 
             language_result = {}
             for path, file in self._files.items():
-                prompts = file.get_prompts_and_translation(language)
+                prompts = file.get_prompts_and_translation(language, self.__include_prompts_without_translation)
                 if len(prompts) > 0:
                     language_result[path] = prompts
 
