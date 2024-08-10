@@ -11,7 +11,7 @@ inputs:
     description: 'prompts without translation will be included in language files if true'
     type: boolean
     required: false
-    default: false
+    default: False
 
 runs:
   using: "composite"
