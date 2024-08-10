@@ -1,6 +1,7 @@
 import argparse
 import json
 from pathlib import Path
+from typing import Sequence
 
 import deepl
 
@@ -17,29 +18,16 @@ class TranslatePlugin():
 
         self._files: dict[str, SourceFile] = {}
         self._existing_translations = Translations()
+        self._languages_to_translate = LANGUAGES
 
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()
 
         self.__translator: deepl.Translator = None
-        self.__glossary: dict[str, deepl.GlossaryInfo] = {}
+        self.__glossary: dict[str, deepl.GlossaryInfo] = {l:None for l in self._languages_to_translate}
+        self.__deepl_api_key: str = None
 
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--deepl_api_key", type=str, default='')
-        args = parser.parse_args()
-        if args.deepl_api_key != '':
-            self.__translator = deepl.Translator(args.deepl_api_key)
-
-            fileDir = Path(__file__).parent
-
-            for language in LANGUAGES:
-                glossary = fileDir/f"{language}.glossary.json"
-                if not glossary.exists():
-                    self.__glossary[language] = None
-                else:
-                    entries = json.loads(glossary.read_text(encoding="UTF-8"))
-                    print(f"Create glossary for {language}")
-                    self.__glossary[language] = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language], entries=entries)
+        self.__parse_args()
 
         self.__read_info_json()
 
@@ -47,17 +35,24 @@ class TranslatePlugin():
         if self.__translator is None:
             return
 
-        for language in LANGUAGES:
+        for language in self._languages_to_translate:
             if self.__glossary[language] is None:
                 continue
 
             self.__translator.delete_glossary(self.__glossary[language])
 
+    def __parse_args(self, args: Sequence[str] | None = None):
+        parser = argparse.ArgumentParser()
+        parser.add_argument("--deepl_api_key", type=str, default='')
+        args = parser.parse_args()
+        self.__deepl_api_key = args.deepl_api_key if args.deepl_api_key != '' else None
 
     def start(self):
         self.get_plugin_translations()
         self.get_core_translations()
+
         self.find_prompts_in_all_files()
+
         self.do_translate()
 
         self.write_plugin_translations()
@@ -82,8 +77,31 @@ class TranslatePlugin():
         if 'language' in data:
             # rename key language by languages to match specs
             data = {"languages" if k == 'language' else k:v for k,v in data.items()}
-        data['languages'] = LANGUAGES
+        data['languages'] = self._languages_to_translate
         info_json.write_text(json.dumps(data, ensure_ascii=False, indent= '\t'), encoding="UTF-8")
+
+    @property
+    def translator(self):
+        if self.__translator is not None:
+            return self.__translator
+
+        if self.__deepl_api_key is not None:
+            self.__translator = deepl.Translator(self.__deepl_api_key)
+            self.__create_deepl_glossaries(self)
+        return self.__translator
+
+    def __create_deepl_glossaries(self):
+        fileDir = Path(__file__).parent
+        glossary = fileDir/"glossary.json"
+        if not glossary.exists():
+            return
+
+        entries = json.loads(glossary.read_text(encoding="UTF-8"))
+        for language in self._languages_to_translate:
+            if language not in entries:
+                continue
+            print(f"Create glossary for {language}")
+            self.__glossary[language] = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language], entries=entries[language])
 
     def find_prompts_in_all_files(self):
         print("Find prompts in all plugin files")
@@ -121,32 +139,30 @@ class TranslatePlugin():
                     # print(f"find translation for {prompt.get_text()} => {tr}")
                     prompt.set_translations(tr)
 
-                if self.__translator is not None:
-                    for language in LANGUAGES:
+                if self.translator is not None:
+                    for language in self._languages_to_translate:
                         if language==FR_FR:
                             continue
                         if prompt.get_translation(language) == '':
-                            result = self.__translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language],
+                            result = self.translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language],
                                                                       preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary[language])
                             prompt.set_translation(language, result.text)
                             self._existing_translations.add_translation(language, prompt.get_text(), result.text)
 
     def get_plugin_translations(self):
         print("Read plugin translations file...")
-
-        self.get_translations_from_json_files(self._plugin_root)
+        self.get_translations_from_json_files(self._plugin_root/"core/i18n")
 
     def get_core_translations(self):
-        print("Read core translations file...")
         if not self._core_root.exists():
             raise RuntimeError(f"Path {self._core_root.as_posix()} does not exists")
 
-        self.get_translations_from_json_files(self._core_root)
+        print("Read core translations file...")
+        self.get_translations_from_json_files(self._core_root/"core/i18n")
 
-    def get_translations_from_json_files(self, root: Path):
-
-        for language in LANGUAGES:
-            file = root/f"core/i18n/{language}.json"
+    def get_translations_from_json_files(self, dir: Path):
+        for language in self._languages_to_translate:
+            file = dir/f"{language}.json"
             if not file.exists():
                 print(f"file {file.as_posix()} not found !?")
                 continue
@@ -162,7 +178,7 @@ class TranslatePlugin():
         translation_path = self._plugin_root/"core/i18n"
         translation_path.mkdir(parents=True, exist_ok=True)
 
-        for language in LANGUAGES:
+        for language in self._languages_to_translate:
             translation_file = translation_path/f"{language}.json"
 
             result = {}
