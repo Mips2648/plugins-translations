@@ -48,7 +48,7 @@ class TranslatePlugin():
         parser.add_argument("--include_prompts_without_translation", type=bool, default=False)
         args = parser.parse_args()
         self.__deepl_api_key = args.deepl_api_key if args.deepl_api_key != '' else None
-        self.__include_prompts_without_translation = args.include_prompts_without_translation
+        self.__include_prompts_without_translation = (args.include_prompts_without_translation != 'false')
 
         if self.__include_prompts_without_translation:
             print("prompts without translation will be included")
