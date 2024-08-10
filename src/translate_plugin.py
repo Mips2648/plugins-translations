@@ -51,9 +51,9 @@ class TranslatePlugin():
         self.__include_prompts_without_translation = (args.include_prompts_without_translation != 'false')
 
         if self.__include_prompts_without_translation:
-            print("prompts without translation will be included")
+            print("prompts without translation will be included !")
         else:
-            print("prompts without translation will not be included")
+            print("prompts without translation will not be included !")
 
     def start(self):
         self.get_plugin_translations()
