@@ -181,12 +181,15 @@ class TranslatePlugin():
         for language in self._languages_to_translate:
             translation_file = translation_path/f"{language}.json"
 
-            result = {}
+            language_result = {}
             for path, file in self._files.items():
-                result[path] = file.get_prompts_and_translation(language)
+                prompts = file.get_prompts_and_translation(language)
+                if len(prompts) > 0:
+                    language_result[path] = prompts
 
-            print(f"Will dump {translation_file.as_posix()}")
-            translation_file.write_text(json.dumps(result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
+            if (len(language_result) > 0):
+                print(f"Will dump {translation_file.as_posix()}")
+                translation_file.write_text(json.dumps(language_result, ensure_ascii=False, sort_keys = True, indent= 4).replace('/', r'\/'), encoding="UTF-8")
 
 if __name__ == "__main__":
     TranslatePlugin().start()
