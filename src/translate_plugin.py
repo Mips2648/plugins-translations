@@ -50,6 +50,11 @@ class TranslatePlugin():
         self.__deepl_api_key = args.deepl_api_key if args.deepl_api_key != '' else None
         self.__include_prompts_without_translation = args.include_prompts_without_translation
 
+        if self.__include_prompts_without_translation:
+            print("prompts without translation will be included")
+        else:
+            print("prompts without translation will not be included")
+
     def start(self):
         self.get_plugin_translations()
         self.get_core_translations()
