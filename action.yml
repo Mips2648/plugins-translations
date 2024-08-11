@@ -13,10 +13,10 @@ inputs:
     required: false
     default: ''
   include_empty_translation:
-    description: 'prompts without translation will be included in language files if true. Default: false'
+    description: 'prompts without translation will be included in language files if true. Default: true'
     type: boolean
     required: false
-    default: false
+    default: true
   use_core_translations:
     description: 'If true, tool will use translations from Jeedom core for missing plugin translations. Default: true'
     type: boolean
