@@ -7,10 +7,6 @@ class Translations():
         self._translation: dict[str, Prompt] = {}
 
     def add_translation(self, language, text, new_translation):
-        if new_translation == text:
-            # not an actual translation, do not keep it
-            return
-
         if text not in self._translation:
             # new text, save it with current translation
             new_prompt = Prompt(text)
