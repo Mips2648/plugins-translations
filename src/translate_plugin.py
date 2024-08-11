@@ -9,6 +9,7 @@ from source_file import SourceFile
 from consts import (
     ALL_LANGUAGES,
     CORE_ROOT,
+    INPUT_DEBUG,
     INPUT_DEEPL_API_KEY,
     INPUT_GENERATE_SOURCE_LANGUAGE_TRANSLATIONS,
     INPUT_INCLUDE_EMPTY_TRANSLATION,
@@ -50,7 +51,6 @@ class TranslatePlugin():
         self.__deepl_api_key: str = None
         self.__api_call_counter = 0
 
-
         self.__get_inputs()
         self.__read_info_json()
 
@@ -85,12 +85,16 @@ class TranslatePlugin():
         self.__include_empty_translation = self._get_boolean_input(INPUT_INCLUDE_EMPTY_TRANSLATION)
         self.__use_core_translations = self._get_boolean_input(INPUT_USE_CORE_TRANSLATIONS)
         self.__generate_source_language_translations = self._get_boolean_input(INPUT_GENERATE_SOURCE_LANGUAGE_TRANSLATIONS)
+        debug = self._get_boolean_input(INPUT_DEBUG)
+        if debug:
+            self._logger.setLevel(logging.DEBUG)
 
         self._logger.info("=== Run plugin translation with following options ===")
         self._logger.info(f"source language: {self._source_language}")
         self._logger.info(f"include empty translation: {self.__include_empty_translation}")
         self._logger.info(f"use core translations: {self.__use_core_translations}")
         self._logger.info(f"generate source language translations: {self.__generate_source_language_translations}")
+        self._logger.info(f"debug: {debug}")
         self._logger.info(f"deepl api key present: {self.__deepl_api_key is not None}")
         self._logger.info("=====================================================")
 
