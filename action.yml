@@ -43,7 +43,6 @@ runs:
       shell: bash
 
     - name: "Generate translations..."
-      main:
       shell: python
       run: |
         ${{ github.action_path }}/src/translate_plugin.py \
