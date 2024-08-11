@@ -67,7 +67,8 @@ class TranslatePlugin():
         self.__use_core_translations = self._get_boolean_input(INPUT_USE_CORE_TRANSLATIONS)
 
     def _get_input(self, name: str):
-        return os.environ[name].strip() if name in os.environ else None
+        val = os.environ[name].strip() if name in os.environ else ''
+        return val if val != '' else None
 
     def _get_boolean_input(self, name: str):
         val = self._get_input(name)
