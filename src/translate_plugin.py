@@ -187,7 +187,7 @@ class TranslatePlugin():
                         jeedom_file_path = absolute_file_path.relative_to(self._plugin_root)
                         jeedom_file_path = (f"plugins/{self._plugin_id}"/jeedom_file_path).as_posix()
                         self._logger.info(f"    {jeedom_file_path}...")
-                        self._files[jeedom_file_path] = SourceFile(absolute_file_path)
+                        self._files[jeedom_file_path] = SourceFile(absolute_file_path, self._logger)
                         self._files[jeedom_file_path].search_prompts()
 
     def do_translate(self):
