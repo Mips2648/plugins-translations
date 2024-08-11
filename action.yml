@@ -2,7 +2,12 @@ name: Translate Plugin
 Description: 'Action to translate a Jeedom Plugin'
 
 inputs:
-  deepl_api_key:  # id of input
+  source_language:
+    description: 'source language for translations, must be one of the following value: "fr_FR | en_US | es_ES | de_DE"'
+    type: string
+    required: false
+    default: 'fr_FR'
+  deepl_api_key:
     description: 'deepl API KEY for automatic translation'
     type: string
     required: false
@@ -44,12 +49,11 @@ runs:
     - name: "Generate translations..."
       shell: bash
       env:
+        source_language: ${{ inputs.source_language }}
         deepl_api_key: ${{ inputs.deepl_api_key }}
         include_empty_translation: ${{ inputs.include_empty_translation }}
         use_core_translations: ${{ inputs.use_core_translations }}
       run: |
-        ls -la
-        python --version
         python ${{ github.action_path }}/src/translate_plugin.py
 
     - name: "Create Pull Request to plugin..."

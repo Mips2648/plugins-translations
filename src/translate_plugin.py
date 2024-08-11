@@ -1,13 +1,11 @@
-import argparse
 import json
 import os
 from pathlib import Path
-from typing import Sequence
 
 import deepl
 
 from source_file import SourceFile
-from consts import CORE_ROOT, INPUT_DEEPL_API_KEY, INPUT_INCLUDE_EMPTY_TRANSLATION, FILE_EXTS, FR_FR, INPUT_USE_CORE_TRANSLATIONS, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import ALL_LANGUAGES, CORE_ROOT, INPUT_DEEPL_API_KEY, INPUT_INCLUDE_EMPTY_TRANSLATION, FILE_EXTS, INPUT_SOURCE_LANGUAGE, INPUT_USE_CORE_TRANSLATIONS, DEFAULT_TARGET_LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
@@ -19,7 +17,8 @@ class TranslatePlugin():
 
         self._files: dict[str, SourceFile] = {}
         self._existing_translations = Translations()
-        self._languages_to_translate = LANGUAGES
+        self._source_language: str
+        self._languages_to_translate = DEFAULT_TARGET_LANGUAGES
         self.__include_empty_translation: bool = False
         self.__use_core_translations: bool = True
 
@@ -29,6 +28,8 @@ class TranslatePlugin():
         self.__translator: deepl.Translator = None
         self.__glossary: dict[str, deepl.GlossaryInfo] = {l:None for l in self._languages_to_translate}
         self.__deepl_api_key: str = None
+        self.__api_call_counter = 0
+
 
         self.__get_inputs()
         self.__read_info_json()
@@ -59,6 +60,8 @@ class TranslatePlugin():
 
     def __get_inputs(self):
 
+        self._source_language = self._get_list_input(INPUT_SOURCE_LANGUAGE, ALL_LANGUAGES)
+
         self.__deepl_api_key = self._get_input(INPUT_DEEPL_API_KEY)
         self.__include_empty_translation = self._get_boolean_input(INPUT_INCLUDE_EMPTY_TRANSLATION)
         self.__use_core_translations = self._get_boolean_input(INPUT_USE_CORE_TRANSLATIONS)
@@ -75,7 +78,13 @@ class TranslatePlugin():
         elif val in falseValue:
             return False
         else:
-            raise ValueError(f'Input does not meet YAML 1.2 "Core Schema" specification: {name}.\n Support boolean input list: "true | True | TRUE | false | False | FALSE"')
+            raise ValueError(f'Input does not meet specifications: {name}.\n Support boolean input list: "true | True | TRUE | false | False | FALSE"')
+
+    def _get_list_input(self, name: str, list: list):
+        val = self._get_input(name)
+        if val is None or val not in list:
+            raise ValueError(f'Input does not meet specifications: {name}.\n Support input list: {list}')
+        return val
 
     def __read_info_json(self):
         info_json = self._plugin_root/PLUGIN_INFO_JSON
@@ -110,16 +119,16 @@ class TranslatePlugin():
 
     def __create_deepl_glossaries(self):
         fileDir = Path(__file__).parent
-        glossary = fileDir/"glossary.json"
+        glossary = fileDir/f"{self._source_language}_glossary.json"
         if not glossary.exists():
             return
 
         entries = json.loads(glossary.read_text(encoding="UTF-8"))
-        for language in self._languages_to_translate:
-            if language not in entries:
+        for target_language in self._languages_to_translate:
+            if target_language ==  self._source_language or target_language not in entries:
                 continue
-            print(f"Create glossary for {language}")
-            self.__glossary[language] = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language], entries=entries[language])
+            print(f"Create glossary {self._source_language}=>{target_language}")
+            self.__glossary[target_language] = self.__translator.create_glossary('plugin', source_lang=LANGUAGES_TO_DEEPL[self._source_language], target_lang=LANGUAGES_TO_DEEPL[target_language], entries=entries[target_language])
 
     def find_prompts_in_all_files(self):
         print("Find prompts in all plugin files")
@@ -158,14 +167,16 @@ class TranslatePlugin():
                     prompt.set_translations(tr)
 
                 if self.translator is not None:
-                    for language in self._languages_to_translate:
-                        if language==FR_FR:
+                    for target_language in self._languages_to_translate:
+                        if target_language==self._source_language:
                             continue
-                        if prompt.get_translation(language) == '':
-                            result = self.translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[FR_FR], target_lang=LANGUAGES_TO_DEEPL[language],
-                                                                      preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary[language])
-                            prompt.set_translation(language, result.text)
-                            self._existing_translations.add_translation(language, prompt.get_text(), result.text)
+                        if prompt.get_translation(target_language) == '':
+                            self.__api_call_counter += 1
+                            result = self.translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[self._source_language], target_lang=LANGUAGES_TO_DEEPL[target_language],
+                                                                      preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary[target_language])
+                            prompt.set_translation(target_language, result.text)
+                            self._existing_translations.add_translation(target_language, prompt.get_text(), result.text)
+        print(f"Number of api call done: {self.__api_call_counter}")
 
     def get_plugin_translations(self):
         print("Read plugin translations file...")
