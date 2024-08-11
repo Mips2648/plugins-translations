@@ -1,15 +1,15 @@
 
-import inspect
+from logging import Logger
 from pathlib import Path
 import re
-import sys
 
 from prompt import Prompt
 
 class SourceFile(object):
 
-    def __init__ (self, file: Path):
+    def __init__ (self, file: Path, logger: Logger):
         self._file = file
+        self._logger = logger
         self._prompts: dict[str, Prompt] = {}
 
     def get_prompts(self):
@@ -20,29 +20,23 @@ class SourceFile(object):
             self._prompts[text] = Prompt(text)
 
     def search_prompts(self):
-        pattern = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<texte>.*?)(?P=delim))\s*,\s*\S+\s*\)')
-        try:
-            content = self._file.read_text(encoding="UTF-8")
-        except Exception as ex:
-            info = inspect.currentframe()
-            print (ex, "( at line" , info.f_lineno , ")")
-            sys.exit(1)
-
+        content = self._file.read_text(encoding="UTF-8")
         for txt in re.findall("{{(.*?)}}", content):
             if len(txt) != 0:
                 self._add_prompt(txt)
             else:
-                Warning (f"ATTENTION, il y a un texte de longueur 0 dans le fichier <{self._file.as_posix()}>")
+                self._logger.warning(f"There is an empty text in <{self._file.as_posix()}>")
 
         if self._file.suffix == ".php":
+            pattern = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<text>.*?)(?P=separator))\s*,\s*\S+\s*\)')
             for match in pattern.finditer(content):
-                text = match.group('texte')
-                delim = match.group('delim')
-                regex = r'(^' + delim + r')|([^\\]' + delim + r')'
+                text = match.group('text')
+                separator = match.group('separator')
+                regex = r'(^' + separator + r')|([^\\]' + separator + r')'
                 if re.search(regex,text):
-                    print("====  Délimineur de début et fin de chaîne trouvé dans le texte !!!")
-                    print(f"      Fichier: {self._file.as_uri()}")
-                    print(f"      texte  : {text}")
+                    self._logger.warning("====  String separator found in text !!!")
+                    self._logger.warning(f"      Fichier: {self._file.as_uri()}")
+                    self._logger.warning(f"      texte  : {text}")
                 else:
                     self._add_prompt(text)
 
