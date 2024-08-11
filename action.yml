@@ -43,11 +43,10 @@ runs:
       shell: bash
 
     - name: "Generate translations..."
-      shell: bash
+      main:
+      shell: python
       run: |
-        ls -la
-        python --version
-        python plugins_translations/src/translate_plugin.py \
+        ${{ github.action_path }}/src/translate_plugin.py \
           --include_prompts_without_translation '${{ inputs.include_prompts_without_translation }}' \
           ${{ inputs.deepl_api_key != '' && format('--deepl_api_key {0}', inputs.deepl_api_key) || ''}}
 
