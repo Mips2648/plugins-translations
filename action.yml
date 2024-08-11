@@ -38,6 +38,9 @@ runs:
 
     - name: "Generate translations..."
       shell: bash
+      env:
+        deepl_api_key: ${{ inputs.deepl_api_key }}
+        include_prompts_without_translation: ${{ inputs.include_prompts_without_translation }}
       run: |
         ls -la
         python --version
