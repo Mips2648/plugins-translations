@@ -7,7 +7,7 @@ from typing import Sequence
 import deepl
 
 from source_file import SourceFile
-from consts import CORE_ROOT, FILE_EXTS, FR_FR, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import CORE_ROOT, INPUT_DEEPL_API_KEY, INPUT_INCLUDE_EMPTY_TRANSLATION, FILE_EXTS, FR_FR, INPUT_USE_CORE_TRANSLATIONS, LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
 from translations import Translations
 
 class TranslatePlugin():
@@ -20,7 +20,8 @@ class TranslatePlugin():
         self._files: dict[str, SourceFile] = {}
         self._existing_translations = Translations()
         self._languages_to_translate = LANGUAGES
-        self.__include_prompts_without_translation: bool = False
+        self.__include_empty_translation: bool = False
+        self.__use_core_translations: bool = True
 
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()
@@ -29,10 +30,7 @@ class TranslatePlugin():
         self.__glossary: dict[str, deepl.GlossaryInfo] = {l:None for l in self._languages_to_translate}
         self.__deepl_api_key: str = None
 
-        self.__parse_args()
-
-        print(os.environ)
-
+        self.__get_inputs()
         self.__read_info_json()
 
     def __del__(self):
@@ -45,22 +43,11 @@ class TranslatePlugin():
 
             self.__translator.delete_glossary(self.__glossary[language])
 
-    def __parse_args(self, args: Sequence[str] | None = None):
-        parser = argparse.ArgumentParser()
-        parser.add_argument("--deepl_api_key", type=str, default='')
-        parser.add_argument("--include_prompts_without_translation", type=str, default='false')
-        args = parser.parse_args()
-        self.__deepl_api_key = args.deepl_api_key if args.deepl_api_key != '' else None
-        self.__include_prompts_without_translation = (str(args.include_prompts_without_translation) != 'false')
-
-        if self.__include_prompts_without_translation:
-            print("prompts without translation will be included !")
-        else:
-            print("prompts without translation will not be included !")
-
     def start(self):
         self.get_plugin_translations()
-        self.get_core_translations()
+
+        if self.__use_core_translations:
+            self.get_core_translations()
 
         self.find_prompts_in_all_files()
 
@@ -69,6 +56,26 @@ class TranslatePlugin():
         self.write_plugin_translations()
 
         self.__write_info_json()
+
+    def __get_inputs(self):
+
+        self.__deepl_api_key = self._get_input(INPUT_DEEPL_API_KEY)
+        self.__include_empty_translation = self._get_boolean_input(INPUT_INCLUDE_EMPTY_TRANSLATION)
+        self.__use_core_translations = self._get_boolean_input(INPUT_USE_CORE_TRANSLATIONS)
+
+    def _get_input(self, name: str):
+        return os.environ[name].strip() if name in os.environ else None
+
+    def _get_boolean_input(self, name: str):
+        val = self._get_input(name)
+        trueValue = ['true', 'True', 'TRUE']
+        falseValue = ['false', 'False', 'FALSE']
+        if val in trueValue:
+            return True
+        elif val in falseValue:
+            return False
+        else:
+            raise ValueError(f'Input does not meet YAML 1.2 "Core Schema" specification: {name}.\n Support boolean input list: "true | True | TRUE | false | False | FALSE"')
 
     def __read_info_json(self):
         info_json = self._plugin_root/PLUGIN_INFO_JSON
@@ -98,7 +105,7 @@ class TranslatePlugin():
 
         if self.__deepl_api_key is not None:
             self.__translator = deepl.Translator(self.__deepl_api_key)
-            self.__create_deepl_glossaries(self)
+            self.__create_deepl_glossaries()
         return self.__translator
 
     def __create_deepl_glossaries(self):
@@ -194,7 +201,7 @@ class TranslatePlugin():
 
             language_result = {}
             for path, file in self._files.items():
-                prompts = file.get_prompts_and_translation(language, self.__include_prompts_without_translation)
+                prompts = file.get_prompts_and_translation(language, self.__include_empty_translation)
                 if len(prompts) > 0:
                     language_result[path] = prompts
 

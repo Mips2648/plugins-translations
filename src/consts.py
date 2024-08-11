@@ -24,3 +24,7 @@ LANGUAGES_TO_DEEPL = {
     ES_ES: 'ES',
     DE_DE: 'DE'
 }
+
+INPUT_DEEPL_API_KEY = 'deepl_api_key'
+INPUT_INCLUDE_EMPTY_TRANSLATION = 'include_empty_translation'
+INPUT_USE_CORE_TRANSLATIONS = 'use_core_translations'

@@ -7,7 +7,7 @@ inputs:
     type: string
     required: false
     default: ''
-  include_prompts_without_translation:
+  include_empty_translation:
     description: 'prompts without translation will be included in language files if true'
     type: boolean
     required: false
@@ -40,13 +40,11 @@ runs:
       shell: bash
       env:
         deepl_api_key: ${{ inputs.deepl_api_key }}
-        include_prompts_without_translation: ${{ inputs.include_prompts_without_translation }}
+        include_empty_translation: ${{ inputs.include_empty_translation }}
       run: |
         ls -la
         python --version
-        python ${{ github.action_path }}/src/translate_plugin.py \
-          --include_prompts_without_translation '${{ inputs.include_prompts_without_translation }}' \
-          ${{ inputs.deepl_api_key != '' && format('--deepl_api_key {0}', inputs.deepl_api_key) || ''}}
+        python ${{ github.action_path }}/src/translate_plugin.py
 
     - name: "Create Pull Request to plugin..."
       uses: peter-evans/create-pull-request@v6
