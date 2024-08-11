@@ -8,7 +8,7 @@ class Prompt():
         return self._text
 
     def has_translation(self, language: str):
-        return language in self._translations
+        return language in self._translations and self._translations[language] != ''
 
     def set_translation(self, language: str, translation: str):
         self._translations[language] = translation

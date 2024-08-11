@@ -66,10 +66,12 @@ class TranslatePlugin():
         self.__include_empty_translation = self._get_boolean_input(INPUT_INCLUDE_EMPTY_TRANSLATION)
         self.__use_core_translations = self._get_boolean_input(INPUT_USE_CORE_TRANSLATIONS)
 
+        print("=== Run plugin translation with following options ===")
         print(f"source language: {self._source_language}")
         print(f"include empty translation: {self.__include_empty_translation}")
         print(f"use core translations: {self.__use_core_translations}")
         print(f"deepl api key present: {self.__deepl_api_key is not None}")
+        print("=====================================================")
 
     def _get_input(self, name: str):
         val = os.environ[name].strip() if name in os.environ else ''
