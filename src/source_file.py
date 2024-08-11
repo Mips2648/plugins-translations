@@ -28,7 +28,7 @@ class SourceFile(object):
                 self._logger.warning(f"There is an empty text in <{self._file.as_posix()}>")
 
         if self._file.suffix == ".php":
-            pattern = re.compile(r'__\s*\(\s*((?P<delim>["\'])(?P<text>.*?)(?P=separator))\s*,\s*\S+\s*\)')
+            pattern = re.compile(r'__\s*\(\s*((?P<separator>["\'])(?P<text>.*?)(?P=separator))\s*,\s*\S+\s*\)')
             for match in pattern.finditer(content):
                 text = match.group('text')
                 separator = match.group('separator')
