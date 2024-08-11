@@ -17,6 +17,7 @@ from consts import (
     INPUT_USE_CORE_TRANSLATIONS,
     DEFAULT_TARGET_LANGUAGES,
     LANGUAGES_TO_DEEPL,
+    LOG_FORMAT,
     PLUGIN_DIRS,
     PLUGIN_INFO_JSON,
     PLUGIN_ROOT
@@ -39,7 +40,7 @@ class TranslatePlugin():
         self.__generate_source_language_translations: bool = False
 
         self._logger = logging.getLogger(__name__)
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
 
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()
