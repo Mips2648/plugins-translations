@@ -21,7 +21,7 @@ This workflow will:
 
 ### Permissions settings
 
-First, you must grant Github actions write permission and allow to create pull requests. To do this, go to your repository `settings`, `Actions` tab and then `General`.
+First, you must grant Github actions write permission and allow to create pull requests. To do this, go to your repository *settings*, *Actions* tab and then *General*.
 
 ![actions_general](actions_general.png)
 
@@ -97,6 +97,24 @@ Currently not compatible with core translations but should be ok regarding exist
 ### deepl_api_key
 
 If provided, all your prompts will be translated!
+
+> Warning
+>
+> Do not put your key in clear in the workflow but save it as actions secrets.
+
+Go to you repository *Settings*, then *Secrets and variables* tab and finally *Actions*.
+Click on *New repository secret*, choose a name (e.g. DEEPL_API_KEY but could be anything) and store the API key you will find in your deepl account.
+
+![secrets](secrets.png)
+
+Then to use it in the wokflow you can use following syntax `${{ secrets.DEEPL_API_KEY }}`, where `DEEPL_API_KEY` is the name of the secret.
+
+Example:
+
+```YAML
+        with:
+          deepl_api_key: ${{ secrets.DEEPL_API_KEY }}
+````
 
 ### include_empty_translation
 
