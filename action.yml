@@ -11,7 +11,12 @@ inputs:
     description: 'prompts without translation will be included in language files if true'
     type: boolean
     required: false
-    default: False
+    default: false
+  use_core_translations:
+    description: 'If true, tool will use translations from Jeedom core for missing plugin translations'
+    type: boolean
+    required: false
+    default: true
 
 runs:
   using: "composite"
@@ -41,6 +46,7 @@ runs:
       env:
         deepl_api_key: ${{ inputs.deepl_api_key }}
         include_empty_translation: ${{ inputs.include_empty_translation }}
+        use_core_translations: ${{ inputs.use_core_translations }}
       run: |
         ls -la
         python --version
