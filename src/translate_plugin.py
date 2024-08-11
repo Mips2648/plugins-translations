@@ -1,5 +1,6 @@
 import argparse
 import json
+import os
 from pathlib import Path
 from typing import Sequence
 
@@ -29,6 +30,8 @@ class TranslatePlugin():
         self.__deepl_api_key: str = None
 
         self.__parse_args()
+
+        print("environ: " + os.environ)
 
         self.__read_info_json()
 
