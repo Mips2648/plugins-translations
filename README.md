@@ -1,4 +1,4 @@
-# Mips's plugin-translations workflow
+# Mips's plugin-translations GitHub action
 
 A GitHub action to automatically generate translation files for your plugins and optionally automatically translated texts if all languages you want.
 
