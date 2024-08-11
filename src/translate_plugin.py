@@ -135,9 +135,9 @@ class TranslatePlugin():
 
         data = json.loads(info_json.read_text(encoding="UTF-8"))
         if 'language' in data:
-            # rename key language by languages to match specs
+            # rename key language by languages to match jeedom specification
             data = {"languages" if k == 'language' else k:v for k,v in data.items()}
-        data['languages'] = self._languages_to_translate
+        data['languages'] = list(set([self._source_language] + self._languages_to_translate))
         info_json.write_text(json.dumps(data, ensure_ascii=False, indent= '\t'), encoding="UTF-8")
 
     @property
