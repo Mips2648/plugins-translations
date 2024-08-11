@@ -57,3 +57,7 @@ runs:
         title: "Update translations"
         body: "Automated translations done by [Mips2648/plugins-translations workflow](https://github.com/Mips2648/plugins-translations)"
         commit-message: "Auto update translation done by Mips2648/plugins-translations workflow"
+
+branding:
+  icon: 'globe'
+  color: 'orange'
