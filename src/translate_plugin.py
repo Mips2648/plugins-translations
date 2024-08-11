@@ -31,7 +31,7 @@ class TranslatePlugin():
 
         self.__parse_args()
 
-        print("environ: " + os.environ)
+        print(os.environ)
 
         self.__read_info_json()
 
