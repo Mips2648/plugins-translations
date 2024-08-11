@@ -22,12 +22,6 @@ runs:
       with:
         path: 'plugin'
 
-    - name: "Checkout Mips2648/plugins-translations sources"
-      uses: actions/checkout@v4
-      with:
-        repository: 'Mips2648/plugins-translations'
-        path: 'plugins_translations'
-
     - name: "Checkout jeedom/core for default translations"
       uses: actions/checkout@v4
       with:
@@ -39,7 +33,7 @@ runs:
       uses: actions/setup-python@v5
       with:
         python-version: '3.12'
-    - run: pip install -r plugins_translations/requirements.txt
+    - run: pip install -r ${{ github.action_path }}/requirements.txt
       shell: bash
 
     - name: "Generate translations..."
