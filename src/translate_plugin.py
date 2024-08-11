@@ -6,7 +6,21 @@ from pathlib import Path
 import deepl
 
 from source_file import SourceFile
-from consts import ALL_LANGUAGES, CORE_ROOT, INPUT_DEEPL_API_KEY, INPUT_GENERATE_SOURCE_LANGUAGE_TRANSLATIONS, INPUT_INCLUDE_EMPTY_TRANSLATION, FILE_EXTS, INPUT_SOURCE_LANGUAGE, INPUT_USE_CORE_TRANSLATIONS, DEFAULT_TARGET_LANGUAGES, LANGUAGES_TO_DEEPL, PLUGIN_DIRS, PLUGIN_INFO_JSON, PLUGIN_ROOT
+from consts import (
+    ALL_LANGUAGES,
+    CORE_ROOT,
+    INPUT_DEEPL_API_KEY,
+    INPUT_GENERATE_SOURCE_LANGUAGE_TRANSLATIONS,
+    INPUT_INCLUDE_EMPTY_TRANSLATION,
+    FILE_EXTS,
+    INPUT_SOURCE_LANGUAGE,
+    INPUT_USE_CORE_TRANSLATIONS,
+    DEFAULT_TARGET_LANGUAGES,
+    LANGUAGES_TO_DEEPL,
+    PLUGIN_DIRS,
+    PLUGIN_INFO_JSON,
+    PLUGIN_ROOT
+    )
 from translations import Translations
 
 class TranslatePlugin():
@@ -25,7 +39,7 @@ class TranslatePlugin():
         self.__generate_source_language_translations: bool = False
 
         self._logger = logging.getLogger(__name__)
-        logging.basicConfig(logging.INFO)
+        logging.basicConfig(level=logging.INFO)
 
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()
