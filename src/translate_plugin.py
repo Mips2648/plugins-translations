@@ -36,7 +36,6 @@ class TranslatePlugin():
         self._existing_translations = Translations()
         self._source_language: str
         self._languages_to_translate = DEFAULT_TARGET_LANGUAGES
-        self._languages_to_translate.sort()
         self.__include_empty_translation: bool = False
         self.__use_core_translations: bool = True
         self.__generate_source_language_translations: bool = False
@@ -138,7 +137,7 @@ class TranslatePlugin():
         if 'language' in data:
             # rename key language by languages to match jeedom specification
             data = {"languages" if k == 'language' else k:v for k,v in data.items()}
-        data['languages'] = list(set([self._source_language] + self._languages_to_translate))
+        data['languages'] = sorted(set([self._source_language] + self._languages_to_translate))
         info_json.write_text(json.dumps(data, ensure_ascii=False, indent= '\t'), encoding="UTF-8")
 
     @property
