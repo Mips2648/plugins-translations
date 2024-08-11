@@ -3,32 +3,32 @@ Description: 'Action to translate a Jeedom Plugin'
 
 inputs:
   source_language:
-    description: 'source language for translations, must be one of the following value: "fr_FR | en_US | es_ES | de_DE"'
+    description: 'source language for translations, must be one of the following value: "fr_FR | en_US | es_ES | de_DE". Default: "fr_FR"'
     type: string
     required: false
     default: 'fr_FR'
   deepl_api_key:
-    description: 'deepl API KEY for automatic translation'
+    description: 'deepl API KEY for automatic translation; If provided, missing translations will be automatically translated using deepl API. Please create a free account on https://www.deepl.com'
     type: string
     required: false
     default: ''
   include_empty_translation:
-    description: 'prompts without translation will be included in language files if true'
+    description: 'prompts without translation will be included in language files if true. Default: false'
     type: boolean
     required: false
     default: false
   use_core_translations:
-    description: 'If true, tool will use translations from Jeedom core for missing plugin translations'
+    description: 'If true, tool will use translations from Jeedom core for missing plugin translations. Default: true'
     type: boolean
     required: false
     default: true
   generate_source_language_translations:
-    description: 'If true, the translation file corresponding to the source language will be generated (which is useless)'
+    description: 'If true, the translation file corresponding to the source language will be generated (which is useless). Default: false'
     type: boolean
     required: false
     default: false
   debug:
-    description: 'If true, log level will be set to debug'
+    description: 'If true, log level will be set to debug. Default: false'
     type: boolean
     required: false
     default: false
