@@ -88,7 +88,7 @@ All inputs are **optional**. If not set, defaults values will be used.
 | Name | Description | type | Default |
 | --- | --- | --- | --- |
 | `source_language` | Source language for translations, must be one of the following value: `fr_FR`, `en_US`, `es_ES`, `de_DE`, `it_IT` *(incompatible with use_core_translations)* | `string` | `fr_FR` |
-| `target_languages` | Target languages for translations, must be a list of comma separated languages (allowed values are: "fr_FR, en_US, es_ES, de_DE, it_IT") | `string` | `en_US,es_ES,de_DE` |
+| `target_languages` | Target languages for translations, must be a list of comma separated languages (allowed values are: "fr_FR,en_US,es_ES,de_DE,it_IT") | `string` | `en_US,es_ES,de_DE` |
 | `deepl_api_key` | [deepl API KEY](https://www.deepl.com) for automatic translation; If provided, missing translations will be automatically translated using deepl API. Please create a free account on <https://www.deepl.com> | `string` | '' |
 | `include_empty_translation` | Include prompts without translation language files | `boolean` | `true` |
 | `use_core_translations` | Tool will use translations from Jeedom core for missing plugin translations (before calling deepl api if available) *(only if source_language is fr_FR)* | `boolean` | `true` |
