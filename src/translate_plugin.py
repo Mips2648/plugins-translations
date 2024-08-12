@@ -83,7 +83,7 @@ class TranslatePlugin():
     def __get_inputs(self):
 
         self._source_language = self._get_input_in_list(INPUT_SOURCE_LANGUAGE, ALL_LANGUAGES)
-        self._target_languages = self._get_list_input(INPUT_TARGET_LANGUAGES)
+        self._target_languages = self._get_list_input(INPUT_TARGET_LANGUAGES, ALL_LANGUAGES)
         self.__deepl_api_key = self._get_input(INPUT_DEEPL_API_KEY)
         self.__include_empty_translation = self._get_boolean_input(INPUT_INCLUDE_EMPTY_TRANSLATION)
         if self._source_language != FR_FR:
@@ -120,15 +120,18 @@ class TranslatePlugin():
         else:
             raise ValueError(f'Input does not meet specifications: {name}.\n Support boolean input list: "true | True | TRUE | false | False | FALSE"')
 
-    def _get_list_input(self, name: str):
+    def _get_list_input(self, name: str, allowed_values: list):
         val = self._get_input(name)
-        list = val.split(',')
-        return [s.strip() for s in list]
+        list = [s.strip() for s in val.split(',')]
+        for s in list:
+            if s not in allowed_values:
+                raise ValueError(f'Input does not meet specifications: {name}.\n Support input list: {allowed_values}')
+        return list
 
-    def _get_input_in_list(self, name: str, list: list):
+    def _get_input_in_list(self, name: str, allowed_values: list):
         val = self._get_input(name)
-        if val is None or val not in list:
-            raise ValueError(f'Input does not meet specifications: {name}.\n Support input list: {list}')
+        if val is None or val not in allowed_values:
+            raise ValueError(f'Input does not meet specifications: {name}.\n Support input list: {allowed_values}')
         return val
 
     def __read_info_json(self):
