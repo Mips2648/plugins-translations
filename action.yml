@@ -3,10 +3,15 @@ Description: 'Action to translate a Jeedom Plugin'
 
 inputs:
   source_language:
-    description: 'Source language for translations, must be one of the following value: "fr_FR | en_US | es_ES | de_DE". Default: "fr_FR"'
+    description: 'Source language for translations, must be one of the following value: "fr_FR | en_US | es_ES | de_DE | it_IT". Default: "fr_FR"'
     type: string
     required: false
     default: 'fr_FR'
+  target_languages:
+    description: 'Target languages for translations, must be a list of comma separated language codes (allowed values are: "fr_FR | en_US | es_ES | de_DE | it_IT"). Default: "en_US,es_ES,de_DE"'
+    type: string
+    required: false
+    default: 'en_US,es_ES,de_DE'
   deepl_api_key:
     description: 'deepl API KEY for automatic translation; If provided, missing translations will be automatically translated using deepl API. Please create a free account on https://www.deepl.com'
     type: string
@@ -60,6 +65,7 @@ runs:
       shell: bash
       env:
         source_language: ${{ inputs.source_language }}
+        target_languages: ${{ inputs.target_languages }}
         deepl_api_key: ${{ inputs.deepl_api_key }}
         include_empty_translation: ${{ inputs.include_empty_translation }}
         use_core_translations: ${{ inputs.use_core_translations }}
