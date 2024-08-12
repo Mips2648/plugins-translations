@@ -139,3 +139,5 @@ Why would you use this feature? It is completely useless :-)
 ### debug
 
 Because issues happen.
+
+## Glossaries

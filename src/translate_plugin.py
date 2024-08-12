@@ -31,8 +31,6 @@ class TranslatePlugin():
 
     def __init__(self) -> None:
         self._plugin_root = Path.cwd()/PLUGIN_ROOT
-        self._plugin_id: str
-        self._plugin_name: str
 
         self._files: dict[str, SourceFile] = {}
         self._existing_translations = Translations()
@@ -52,6 +50,9 @@ class TranslatePlugin():
         self.__deepl_api_key: str = None
         self.__api_call_counter = 0
 
+        self.__info_json_file: Path = self._plugin_root/PLUGIN_INFO_JSON
+        self.__info_json_content: dict = None
+
         self.__get_inputs()
         self.__read_info_json()
 
@@ -62,10 +63,24 @@ class TranslatePlugin():
             return
 
         for language in self._target_languages:
-            if self.__glossary[language] is None:
+            if language not in self.__glossary or self.__glossary[language] is None:
                 continue
 
             self.__translator.delete_glossary(self.__glossary[language])
+
+    @property
+    def translator(self):
+        if self.__translator is not None:
+            return self.__translator
+
+        if self.__deepl_api_key is not None:
+            self.__translator = deepl.Translator(self.__deepl_api_key)
+            self.__create_deepl_glossaries()
+        return self.__translator
+
+    @property
+    def plugin_id(self) -> str:
+        return self.__info_json_content['id']
 
     def start(self):
         self.get_plugin_translations()
@@ -76,6 +91,7 @@ class TranslatePlugin():
         self.find_prompts_in_all_files()
 
         self.do_translate()
+        self.translate_info_json()
 
         self.write_plugin_translations()
 
@@ -136,32 +152,13 @@ class TranslatePlugin():
         return val
 
     def __read_info_json(self):
-        info_json = self._plugin_root/PLUGIN_INFO_JSON
-        if not info_json.is_file():
+        if not self.__info_json_file.is_file():
             raise RuntimeError("Missing info.json file")
-
-        data = json.loads(info_json.read_text(encoding="UTF-8"))
-        self._plugin_id = data['id']
-        self._plugin_name = data['name']
+        self.__info_json_content = json.loads(self.__info_json_file.read_text(encoding="UTF-8"))
 
     def __write_info_json(self):
-        info_json = self._plugin_root/PLUGIN_INFO_JSON
-        if not info_json.is_file():
-            raise RuntimeError("Missing info.json file")
-
-        data = json.loads(info_json.read_text(encoding="UTF-8"))
-        data['language'] = sorted(set([self._source_language] + self._target_languages))
-        info_json.write_text(json.dumps(data, ensure_ascii=False, indent= '\t'), encoding="UTF-8")
-
-    @property
-    def translator(self):
-        if self.__translator is not None:
-            return self.__translator
-
-        if self.__deepl_api_key is not None:
-            self.__translator = deepl.Translator(self.__deepl_api_key)
-            self.__create_deepl_glossaries()
-        return self.__translator
+        self.__info_json_content['language'] = sorted(set([self._source_language] + self._target_languages))
+        self.__info_json_file.write_text(json.dumps(self.__info_json_content, ensure_ascii=False, indent= '\t'), encoding="UTF-8")
 
     def __create_deepl_glossaries(self):
         fileDir = Path(__file__).parent
@@ -198,7 +195,7 @@ class TranslatePlugin():
                     if filename.suffix in FILE_EXTS:
                         absolute_file_path = root/filename
                         jeedom_file_path = absolute_file_path.relative_to(self._plugin_root)
-                        jeedom_file_path = (f"plugins/{self._plugin_id}"/jeedom_file_path).as_posix()
+                        jeedom_file_path = (f"plugins/{self.plugin_id}"/jeedom_file_path).as_posix()
                         self._logger.info(f"    {jeedom_file_path}...")
                         self._files[jeedom_file_path] = SourceFile(absolute_file_path, self._logger)
                         self._files[jeedom_file_path].search_prompts()
@@ -222,26 +219,53 @@ class TranslatePlugin():
                         if target_language==self._source_language:
                             continue
                         if not prompt.has_translation(target_language):
-                            self._logger.debug(f"call deepl to translate {prompt.get_text()} in {target_language}")
-                            self.__api_call_counter += 1
-                            result = self.translator.translate_text(prompt.get_text(), source_lang=LANGUAGES_TO_DEEPL[self._source_language], target_lang=LANGUAGES_TO_DEEPL[target_language],
-                                                                      preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary[target_language])
-                            prompt.set_translation(target_language, result.text)
-                            self._existing_translations.add_translation(target_language, prompt.get_text(), result.text)
+                            tr = self.transalte_with_deepl(prompt.get_text(), target_language)
+                            prompt.set_translation(target_language, tr)
+                            self._existing_translations.add_translation(target_language, prompt.get_text(), tr)
         self._logger.info(f"Number of api call done: {self.__api_call_counter}")
+
+    def translate_info_json(self):
+        if 'description' not in self.__info_json_content:
+            self._logger.warning("You should add a 'Description' in info.json, see https://doc.jeedom.com/fr_FR/dev/structure_info_json")
+            return
+        descriptions = self.__info_json_content['description']
+        if not isinstance(descriptions, dict):
+            descriptions = {self._source_language: descriptions}
+
+        if self._source_language not in descriptions:
+            self._logger.warning(f"You should have a 'Description' in info.json that matches your source language: {self._source_language}")
+            return
+        source_desc = descriptions[self._source_language]
+
+        for target_language in self._target_languages:
+            if target_language in descriptions and descriptions[target_language] != '':
+                continue
+            descriptions[target_language] = self.transalte_with_deepl(source_desc, target_language)
+
+        self.__info_json_content['description'] = descriptions
+
+    def transalte_with_deepl(self, text: str, target_language: str) -> str:
+        if self.translator is None:
+            return ''
+
+        self._logger.debug(f"call deepl to translate {text} in {target_language}")
+        self.__api_call_counter += 1
+        result = self.translator.translate_text(text, source_lang=LANGUAGES_TO_DEEPL[self._source_language], target_lang=LANGUAGES_TO_DEEPL[target_language],
+                                                    preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary[target_language])
+        return result.text
 
     def get_plugin_translations(self):
         self._logger.info("Read plugin translations file...")
-        self.get_translations_from_json_files(self._plugin_root/TRANSLATIONS_FILES_PATH)
+        self._get_translations_from_json_files(self._plugin_root/TRANSLATIONS_FILES_PATH)
 
     def get_core_translations(self):
         if not self._core_root.exists():
             raise RuntimeError(f"Path {self._core_root.as_posix()} does not exists")
 
         self._logger.info("Read core translations file...")
-        self.get_translations_from_json_files(self._core_root/TRANSLATIONS_FILES_PATH)
+        self._get_translations_from_json_files(self._core_root/TRANSLATIONS_FILES_PATH)
 
-    def get_translations_from_json_files(self, dir: Path):
+    def _get_translations_from_json_files(self, dir: Path):
         for language in self._target_languages:
             file = dir/f"{language}.json"
             if not file.exists():
