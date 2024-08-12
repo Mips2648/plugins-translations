@@ -17,6 +17,10 @@ This workflow will:
 - Automatically create a branch called `translations` and push changes in it (or adapt files if branch exists already);
 - create a pull request to you need to approve to commit in the changes in the base branch (from where the workflow ran). So you can run it without risk, workflow will not changes anything without your final review!
 
+> Tip
+>
+> Do not forget to quickly review the PR before pushing new changes in your branch otherwise the action will redo all the woks already done but not yet reviewed because the branch `translations` is not used as a source for translations. It is not an issue as such, it will works without problem but it will consume twice deepl credits for the same translations.
+
 ## Quick start
 
 ### Permissions settings
