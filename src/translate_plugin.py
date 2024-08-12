@@ -122,7 +122,8 @@ class TranslatePlugin():
 
     def _get_list_input(self, name: str):
         val = self._get_input(name)
-        return val.split(',')
+        list = val.split(',')
+        return [s.strip() for s in list]
 
     def _get_input_in_list(self, name: str, list: list):
         val = self._get_input(name)
