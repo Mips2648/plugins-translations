@@ -83,10 +83,10 @@ All inputs are **optional**. If not set, defaults values will be used.
 
 | Name | Description | type | Default |
 | --- | --- | --- | --- |
-| `source_language` | Source language for translations, must be one of the following value: `fr_FR`, `en_US`, `es_ES`, `de_DE` *(not fully supported)* | `string` | `fr_FR` |
+| `source_language` | Source language for translations, must be one of the following value: `fr_FR`, `en_US`, `es_ES`, `de_DE` *(incompatible with use_core_translations)* | `string` | `fr_FR` |
 | `deepl_api_key` | [deepl API KEY](https://www.deepl.com) for automatic translation; If provided, missing translations will be automatically translated using deepl API. Please create a free account on <https://www.deepl.com> | `string` | '' |
 | `include_empty_translation` | Include prompts without translation language files | `boolean` | `true` |
-| `use_core_translations` | Tool will use translations from Jeedom core for missing plugin translations (before calling deepl api if available) | `boolean` | `true` |
+| `use_core_translations` | Tool will use translations from Jeedom core for missing plugin translations (before calling deepl api if available) *(only if source_language is fr_FR)* | `boolean` | `true` |
 | `generate_source_language_translations` | The translation file corresponding to the source language will be generated (which is useless) | `boolean` | `false` |
 | `debug` | Set log level to debug | `boolean` | `true` |
 
@@ -114,7 +114,7 @@ Example:
 ```YAML
         with:
           deepl_api_key: ${{ secrets.DEEPL_API_KEY }}
-````
+```
 
 ### include_empty_translation
 
@@ -124,6 +124,8 @@ This param is useless if you provide a valid *deepl API key* because all your tr
 ### use_core_translations
 
 It is relevant to use core translations by default for coherence in user interface but if you don't trust or don't like them, you can deactivate this feature.
+
+If you select a *source_language* different than `fr_FR`, this setting will be forced to false.
 
 ### generate_source_language_translations
 

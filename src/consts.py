@@ -2,6 +2,7 @@ EN_US = "en_US"
 FR_FR = "fr_FR"
 ES_ES = "es_ES"
 DE_DE = "de_DE"
+IT_IT = "it_IT"
 
 DEFAULT_TARGET_LANGUAGES = [
     EN_US,
@@ -13,14 +14,16 @@ ALL_LANGUAGES = [
     FR_FR,
     EN_US,
     ES_ES,
-    DE_DE
+    DE_DE,
+    IT_IT
 ]
 
 LANGUAGES_TO_DEEPL = {
     FR_FR: 'FR',
     EN_US: 'EN-US',
     ES_ES: 'ES',
-    DE_DE: 'DE'
+    DE_DE: 'DE',
+    IT_IT: 'IT'
 }
 
 LOG_FORMAT = '[%(levelname)s] : %(message)s'

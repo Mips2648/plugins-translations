@@ -9,6 +9,7 @@ from source_file import SourceFile
 from consts import (
     ALL_LANGUAGES,
     CORE_ROOT,
+    FR_FR,
     INPUT_DEBUG,
     INPUT_DEEPL_API_KEY,
     INPUT_GENERATE_SOURCE_LANGUAGE_TRANSLATIONS,
@@ -83,7 +84,10 @@ class TranslatePlugin():
         self._source_language = self._get_list_input(INPUT_SOURCE_LANGUAGE, ALL_LANGUAGES)
         self.__deepl_api_key = self._get_input(INPUT_DEEPL_API_KEY)
         self.__include_empty_translation = self._get_boolean_input(INPUT_INCLUDE_EMPTY_TRANSLATION)
-        self.__use_core_translations = self._get_boolean_input(INPUT_USE_CORE_TRANSLATIONS)
+        if self._source_language != FR_FR:
+            self.__use_core_translations = False
+        else:
+            self.__use_core_translations = self._get_boolean_input(INPUT_USE_CORE_TRANSLATIONS)
         self.__generate_source_language_translations = self._get_boolean_input(INPUT_GENERATE_SOURCE_LANGUAGE_TRANSLATIONS)
         debug = self._get_boolean_input(INPUT_DEBUG)
         if debug:
@@ -134,10 +138,7 @@ class TranslatePlugin():
             raise RuntimeError("Missing info.json file")
 
         data = json.loads(info_json.read_text(encoding="UTF-8"))
-        if 'language' in data:
-            # rename key language by languages to match jeedom specification
-            data = {"languages" if k == 'language' else k:v for k,v in data.items()}
-        data['languages'] = sorted(set([self._source_language] + self._languages_to_translate))
+        data['language'] = sorted(set([self._source_language] + self._languages_to_translate))
         info_json.write_text(json.dumps(data, ensure_ascii=False, indent= '\t'), encoding="UTF-8")
 
     @property
