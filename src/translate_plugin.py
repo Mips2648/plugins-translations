@@ -48,12 +48,13 @@ class TranslatePlugin():
         self._core_translations = Translations()
 
         self.__translator: deepl.Translator = None
-        self.__glossary: dict[str, deepl.GlossaryInfo] = {l:None for l in self._target_languages}
         self.__deepl_api_key: str = None
         self.__api_call_counter = 0
 
         self.__get_inputs()
         self.__read_info_json()
+
+        self.__glossary: dict[str, deepl.GlossaryInfo] = {l:None for l in self._target_languages}
 
     def __del__(self):
         if self.__translator is None:
