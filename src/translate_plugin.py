@@ -125,13 +125,13 @@ class TranslatePlugin():
         list = [s.strip() for s in val.split(',')]
         for s in list:
             if s not in allowed_values:
-                raise ValueError(f'Input does not meet specifications: {name}.\n Support input list: {allowed_values}')
+                raise ValueError(f'Input does not meet specifications: {name}.\n {s} not in list: {allowed_values}')
         return list
 
     def _get_input_in_list(self, name: str, allowed_values: list):
         val = self._get_input(name)
         if val is None or val not in allowed_values:
-            raise ValueError(f'Input does not meet specifications: {name}.\n Support input list: {allowed_values}')
+            raise ValueError(f'Input does not meet specifications: {name}.\n {val} not in list: {allowed_values}')
         return val
 
     def __read_info_json(self):
