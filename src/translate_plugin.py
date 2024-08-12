@@ -225,6 +225,9 @@ class TranslatePlugin():
         self._logger.info(f"Number of api call done: {self.__api_call_counter}")
 
     def translate_info_json(self):
+        if self.translator is None:
+            return
+
         if 'description' not in self.__info_json_content:
             self._logger.warning("You should add a 'Description' in info.json, see https://doc.jeedom.com/fr_FR/dev/structure_info_json")
             return
