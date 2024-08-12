@@ -10,16 +10,16 @@ This workflow will:
 - build a list of existing translations based on existing json translation files (i18n) that exist in your plugin, if any;
 - enrich this list with existing translation in jeedom Core (in order to get a good base);
 - parse your source files (`.php`, `.json` and `.js`) located in sub-directories `core`, `desktop` and `plugin_info` (and sub-directories of these of course);
-- translate all texts found with the help of previous existing translations found;
-- optional: call [deepl api](https://www.deepl.com) to translate automatically remaining texts, please create a free account on <https://www.deepl.com> for this, it's free for 500.000 chars by month which should be more than enough for 50 new plugins or more by month;
+- translate all texts found with the help of previous existing translations found (from plugin & Jeedom core);
+- optional: call [deepl api](https://www.deepl.com) to translate automatically remaining texts. Please create a free account on <https://www.deepl.com> for this, it's free for 500.000 chars by month which should be more than enough for 50 new plugins or more by month;
 - generate new translations files (i18n) for selected target languages;
 - adapt info.json file with list of target languages if needed;
-- Automatically create a branch called `translations` and push changes in it (or adapt files if branch exists already);
-- create a pull request to you need to approve to commit in the changes in the base branch (from where the workflow ran). So you can run it without risk, workflow will not changes anything without your final review!
+- Automatically create a branch called `translations` and push changes on it (or adapt files if branch exists already);
+- create a pull request that you need to approve to commit the changes on the base branch (from where the workflow ran). So you can run it without risk, workflow will not changes anything without your final review!
 
 > Tip
 >
-> Do not forget to quickly review the PR before pushing new changes in your branch otherwise the action will redo all the woks already done but not yet reviewed because the branch `translations` is not used as a source for translations. It is not an issue as such, it will works without problem but it will consume twice deepl credits for the same translations.
+> Do not forget to quickly review the PR before pushing new changes in your branch otherwise the action will redo all the woks already done but not yet reviewed because the branch `translations` is not used as a source for translations. It is not an issue as such, it will works without problem but it will consume twice deepl (free) credits for the same translations.
 
 ## Quick start
 
@@ -57,7 +57,7 @@ jobs:
 
 Save it and commit in your beta branch.
 
-It will immediately run and generate translations file for your plugin for following language: de_DE, en_US & es_ES, push changes if any in a new branch `translations` of your repository and create a pull request that you can review and eventually validate. It couldn't be easier ;-)
+It will immediately run and generate translations file for your plugin for following language: de_DE, en_US & es_ES, push changes, if any, in a new branch `translations` of your repository and create a pull request that you can review and eventually validate. It couldn't be easier ;-)
 
 ## Optional input parameters
 
@@ -94,7 +94,7 @@ All inputs are **optional**. If not set, defaults values will be used.
 | `include_empty_translation` | Include prompts without translation language files | `boolean` | `true` |
 | `use_core_translations` | Tool will use translations from Jeedom core for missing plugin translations (before calling deepl api if available) *(only if source_language is fr_FR)* | `boolean` | `true` |
 | `generate_source_language_translations` | The translation file corresponding to the source language will be generated (which is useless) | `boolean` | `false` |
-| `debug` | Set log level to debug | `boolean` | `true` |
+| `debug` | Set log level to debug | `boolean` | `false` |
 
 ### source_language
 
@@ -137,8 +137,34 @@ If you select a *source_language* different than `fr_FR`, this setting will be f
 
 Why would you use this feature? It is completely useless :-)
 
+If set to `true`, the file `fr_FR.json`, e.g., will be generated if source language is `fr_FR` but it is useless because the translation always equals the key.
+
 ### debug
 
 Because issues happen.
 
 ## Glossaries
+
+Some words needs to be have a given translations. e.g. *commande* in french could mean *order* or *command*, *type* in french could mean *kind* or *type* or even *guy* and in the context of Jeedom and home automation, we should force specific translation to avoid weird result.
+To achieve this, we have the concept of glossaries which will contain these specific edge cases. You don't have to manage anything within your workflow for that, this Github action is taking care for you.
+
+But it might happen that you face a case not yet foreseen, so please find below the procedure to add new word in the glossary.
+
+In the `src` folder you will find one json file by source language corresponding to the glossary for that language. The naming convention is `[lang]_glossary.json`; e.g. `fr_FR_glossary.json`.
+This file must contain one key by target language and in each, one key by "word" => "translation".
+The words must be in the singular form.
+
+Example for *fr_FR* glossary:
+
+```JSON
+{
+    "en_US": {
+        "commande": "command",
+        "type": "type",
+        "pièce": "room"
+    }
+}
+```
+
+I've almost no knowledge in others languages than FR and EN, so the only glossary that I could start is the one for *fr_FR* to *en_US*.
+So, please, if you know typical mistakes that automatic translations tools do when translating to DE, ES, IT or PT, do not hesitate to submit a pull-request.
