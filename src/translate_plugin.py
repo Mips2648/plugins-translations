@@ -251,7 +251,7 @@ class TranslatePlugin():
         self._logger.debug(f"call deepl to translate {text} in {target_language}")
         self.__api_call_counter += 1
         result = self.translator.translate_text(text, source_lang=LANGUAGES_TO_DEEPL[self._source_language], target_lang=LANGUAGES_TO_DEEPL[target_language],
-                                                    preserve_formatting=True, context='home automation', split_sentences=0, glossary=self.__glossary[target_language])
+                                                    preserve_formatting=True, context='home automation', glossary=self.__glossary[target_language])
         return result.text
 
     def get_plugin_translations(self):
