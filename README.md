@@ -52,7 +52,7 @@ jobs:
   auto-translate:
     runs-on: ubuntu-latest
     steps:
-      - uses: Mips2648/plugins-translations@v0.26
+      - uses: Mips2648/plugins-translations@main
 ```
 
 Save it and commit in your beta branch.
@@ -77,10 +77,11 @@ jobs:
   auto-translate:
     runs-on: ubuntu-latest
     steps:
-      - uses: Mips2648/plugins-translations@v0.26
+      - uses: Mips2648/plugins-translations@main
         with:
           deepl_api_key: ${{ secrets.DEEPL_API_KEY }}
           include_empty_translation: false
+          target_languages: "en_US,es_ES,de_DE,it_IT,pt_PT"
 ```
 
 All inputs are **optional**. If not set, defaults values will be used.
