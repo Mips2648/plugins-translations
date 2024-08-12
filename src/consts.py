@@ -32,6 +32,7 @@ PLUGIN_INFO_JSON = 'plugin_info/info.json'
 
 PLUGIN_ROOT = 'plugin'
 CORE_ROOT = 'jeedom_core'
+TRANSLATIONS_FILES_PATH = 'core/i18n'
 
 INPUT_SOURCE_LANGUAGE = 'source_language'
 INPUT_TARGET_LANGUAGES = 'target_languages'

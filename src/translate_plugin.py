@@ -22,7 +22,8 @@ from consts import (
     LOG_FORMAT,
     PLUGIN_DIRS,
     PLUGIN_INFO_JSON,
-    PLUGIN_ROOT
+    PLUGIN_ROOT,
+    TRANSLATIONS_FILES_PATH
     )
 from translations import Translations
 
@@ -231,14 +232,14 @@ class TranslatePlugin():
 
     def get_plugin_translations(self):
         self._logger.info("Read plugin translations file...")
-        self.get_translations_from_json_files(self._plugin_root/"core/i18n")
+        self.get_translations_from_json_files(self._plugin_root/TRANSLATIONS_FILES_PATH)
 
     def get_core_translations(self):
         if not self._core_root.exists():
             raise RuntimeError(f"Path {self._core_root.as_posix()} does not exists")
 
         self._logger.info("Read core translations file...")
-        self.get_translations_from_json_files(self._core_root/"core/i18n")
+        self.get_translations_from_json_files(self._core_root/TRANSLATIONS_FILES_PATH)
 
     def get_translations_from_json_files(self, dir: Path):
         for language in self._target_languages:
@@ -255,7 +256,7 @@ class TranslatePlugin():
     def write_plugin_translations(self):
         self._logger.info("Ecriture du/des fichier(s) de traduction(s)...")
 
-        translation_path = self._plugin_root/"core/i18n"
+        translation_path = self._plugin_root/TRANSLATIONS_FILES_PATH
         translation_path.mkdir(parents=True, exist_ok=True)
 
         for target_language in self._target_languages:
