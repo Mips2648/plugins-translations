@@ -42,6 +42,8 @@ class TranslatePlugin():
 
         self._logger = logging.getLogger(__name__)
         logging.basicConfig(level=logging.INFO, format=LOG_FORMAT)
+        logging.getLogger('deepl').setLevel(logging.WARNING)
+
 
         self._core_root = Path.cwd()/CORE_ROOT
         self._core_translations = Translations()

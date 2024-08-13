@@ -23,7 +23,7 @@ LANGUAGES_TO_DEEPL = {
     PT_PT: 'PT-PT'
 }
 
-LOG_FORMAT = '[%(name)s][%(levelname)s] : %(message)s'
+LOG_FORMAT = '[%(levelname)s] : %(message)s'
 
 PLUGIN_DIRS = ['core', 'desktop', 'plugin_info']
 FILE_EXTS = ['.php', '.js', '.json']
