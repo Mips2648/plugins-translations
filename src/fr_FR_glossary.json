@@ -2,6 +2,7 @@
     "en_US": {
         "commande": "command",
         "type": "type",
-        "pièce": "room"
+        "pièce": "room",
+        "vrai": "true"
     }
 }
