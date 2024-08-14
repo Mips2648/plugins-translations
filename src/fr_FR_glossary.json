@@ -3,6 +3,7 @@
         "commande": "command",
         "type": "type",
         "pièce": "room",
-        "vrai": "true"
+        "vrai": "true",
+        "actif": "active"
     }
 }
