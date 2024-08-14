@@ -4,6 +4,7 @@
         "type": "type",
         "pièce": "room",
         "vrai": "true",
-        "actif": "active"
+        "actif": "active",
+        "mode": "mode"
     }
 }
