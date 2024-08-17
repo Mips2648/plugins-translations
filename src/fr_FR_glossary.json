@@ -5,6 +5,7 @@
         "pièce": "room",
         "vrai": "true",
         "actif": "active",
-        "mode": "mode"
+        "mode": "mode",
+        "action": "action"
     }
 }
