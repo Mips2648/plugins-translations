@@ -26,7 +26,7 @@ LANGUAGES_TO_DEEPL = {
 LOG_FORMAT = '[%(levelname)s] : %(message)s'
 
 PLUGIN_DIRS = ['core', 'desktop', 'plugin_info']
-FILE_EXTS = ['.php', '.js', '.json']
+FILE_EXTS = ['.php', '.js', '.json', '.html']
 
 PLUGIN_INFO_JSON = 'plugin_info/info.json'
 
