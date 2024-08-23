@@ -283,7 +283,7 @@ class TranslatePlugin():
                     self._existing_translations.add_translation(language, text, data[path][text])
 
     def write_plugin_translations(self):
-        self._logger.info("Ecriture du/des fichier(s) de traduction(s)...")
+        self._logger.info("Write translations files...")
 
         translation_path = self._plugin_root/TRANSLATIONS_FILES_PATH
         translation_path.mkdir(parents=True, exist_ok=True)
