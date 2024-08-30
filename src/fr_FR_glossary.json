@@ -1,11 +1,12 @@
 {
     "en_US": {
-        "commande": "command",
-        "type": "type",
-        "pièce": "room",
-        "vrai": "true",
         "actif": "active",
+        "action": "action",
+        "commande": "command",
         "mode": "mode",
-        "action": "action"
+        "pièce": "room",
+        "port": "port",
+        "type": "type",
+        "vrai": "true"
     }
 }

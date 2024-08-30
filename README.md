@@ -152,7 +152,7 @@ But it might happen that you face a case not yet foreseen, so please find below 
 
 In the `src` folder you will find one json file by source language corresponding to the glossary for that language. The naming convention is `[lang]_glossary.json`; e.g. `fr_FR_glossary.json`.
 This file must contain one key by target language and in each, one key by "word" => "translation".
-The words must be in the singular form.
+The words must be in the singular form, lower case and preferably in alphabetical order to easily spot them.
 
 Example for *fr_FR* glossary:
 
