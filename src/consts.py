@@ -24,12 +24,12 @@ LANGUAGES_TO_DEEPL = {
 }
 
 LANGUAGES_TO_DEEPL_GLOSSARY = {
-    FR_FR: 'fr',
-    EN_US: 'en',
-    ES_ES: 'es',
-    DE_DE: 'de',
-    IT_IT: 'it',
-    PT_PT: 'pt'
+    FR_FR: 'FR',
+    EN_US: 'EN',
+    ES_ES: 'ES',
+    DE_DE: 'DE',
+    IT_IT: 'IT',
+    PT_PT: 'PT'
 }
 
 LOG_FORMAT = '[%(levelname)s] : %(message)s'
