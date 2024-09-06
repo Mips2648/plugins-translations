@@ -20,6 +20,7 @@ from consts import (
     INPUT_TARGET_LANGUAGES,
     INPUT_USE_CORE_TRANSLATIONS,
     LANGUAGES_TO_DEEPL,
+    LANGUAGES_TO_DEEPL_GLOSSARY,
     LOG_FORMAT,
     PLUGIN_DIRS,
     PLUGIN_INFO_JSON,
@@ -180,7 +181,7 @@ class TranslatePlugin():
             self._logger.info(f"Check glossary {self._source_language}=>{target_language}")
 
             for deepl_glossary in deepl_glossaries:
-                if deepl_glossary.source_lang == LANGUAGES_TO_DEEPL[self._source_language] and deepl_glossary.target_lang == LANGUAGES_TO_DEEPL[target_language]:
+                if deepl_glossary.source_lang == LANGUAGES_TO_DEEPL_GLOSSARY[self._source_language] and deepl_glossary.target_lang == LANGUAGES_TO_DEEPL_GLOSSARY[target_language]:
                     if deepl_glossary.name == md5_hash :
                         self._logger.info(f"Already exists")
                         self.__glossary[target_language] = deepl_glossary
@@ -189,7 +190,7 @@ class TranslatePlugin():
                         self.__translator.delete_glossary(deepl_glossary)
             if self.__glossary[target_language] is None:
                 self._logger.info(f"Create new glossary {md5_hash}")
-                self.__glossary[target_language] = self.__translator.create_glossary(md5_hash, source_lang=LANGUAGES_TO_DEEPL[self._source_language], target_lang=LANGUAGES_TO_DEEPL[target_language], entries=entries[target_language])
+                self.__glossary[target_language] = self.__translator.create_glossary(md5_hash, source_lang=LANGUAGES_TO_DEEPL_GLOSSARY[self._source_language], target_lang=LANGUAGES_TO_DEEPL_GLOSSARY[target_language], entries=entries[target_language])
 
     def find_prompts_in_all_files(self):
         self._logger.info("Find prompts in all plugin files")

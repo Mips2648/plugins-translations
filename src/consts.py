@@ -23,6 +23,15 @@ LANGUAGES_TO_DEEPL = {
     PT_PT: 'PT-PT'
 }
 
+LANGUAGES_TO_DEEPL_GLOSSARY = {
+    FR_FR: 'fr',
+    EN_US: 'en',
+    ES_ES: 'es',
+    DE_DE: 'de',
+    IT_IT: 'it',
+    PT_PT: 'pt'
+}
+
 LOG_FORMAT = '[%(levelname)s] : %(message)s'
 
 PLUGIN_DIRS = ['core', 'desktop', 'plugin_info']
