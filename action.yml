@@ -84,6 +84,7 @@ runs:
           core/i18n/*.json
           plugin_info/info.json
         title: "Update translations"
+        assignees: ${{ github.repository_owner }}
         body: "Automated translations done by [Mips2648/plugins-translations workflow](https://github.com/Mips2648/plugins-translations)"
         commit-message: "Auto update translation done by Mips2648/plugins-translations workflow"
 
