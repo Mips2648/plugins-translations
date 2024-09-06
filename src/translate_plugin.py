@@ -170,7 +170,7 @@ class TranslatePlugin():
             return
 
         str_entries = glossary_file.read_text(encoding="UTF-8")
-        md5_hash = hashlib.md5(str_entries).hexdigest()
+        md5_hash = hashlib.md5(str_entries.encode('utf-8')).hexdigest()
         entries = json.loads(str_entries)
         deepl_glossaries = self.__translator.list_glossaries()
 
