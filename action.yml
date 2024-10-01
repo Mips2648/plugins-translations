@@ -75,7 +75,7 @@ runs:
         python ${{ github.action_path }}/src/translate_plugin.py
 
     - name: "Create Pull Request to plugin..."
-      uses: peter-evans/create-pull-request@v6
+      uses: peter-evans/create-pull-request@v7
       with:
         path: 'plugin'
         branch: translations
