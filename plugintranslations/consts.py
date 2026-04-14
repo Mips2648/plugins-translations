@@ -34,7 +34,7 @@ LANGUAGES_TO_DEEPL_GLOSSARY = {
 
 LOG_FORMAT = '[%(levelname)s] : %(message)s'
 
-PLUGIN_DIRS = ['core', 'desktop', 'plugin_info']
+PLUGIN_DIRS = ['core', 'desktop', 'mobile', 'plugin_info']
 FILE_EXTS = ['.php', '.js', '.json', '.html']
 
 PLUGIN_INFO_JSON = 'plugin_info/info.json'
