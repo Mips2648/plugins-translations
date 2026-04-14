@@ -258,6 +258,13 @@ class PluginTranslator():
         if not isinstance(descriptions, dict):
             descriptions = {self.__source_language: descriptions}
 
+        allowed_languages = set([self.__source_language] + self.__target_languages)
+        descriptions = {
+            language: description
+            for language, description in descriptions.items()
+            if language in allowed_languages
+        }
+
         if self.__source_language not in descriptions:
             self.__logger.warning(f"You should have a 'Description' in info.json that matches your source language: {self.__source_language}")
             return
