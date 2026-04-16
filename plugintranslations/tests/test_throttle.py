@@ -5,6 +5,10 @@ from plugintranslations.throttle import Throttle
 
 class TestThrottle():
 
+    def test_invalid_max_retries(self):
+        with pytest.raises(ValueError, match="max_retries must be >= 1"):
+            Throttle(max_retries=0)
+
     def test_call(self):
 
         seconds_to_wait = 0.1
