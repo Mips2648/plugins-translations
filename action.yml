@@ -92,7 +92,7 @@ runs:
         branch: translations
         delete-branch: true
         add-paths: ${{ steps.stage_files.outputs.add_paths }}
-        title: "Update translations"
+        title: "[CI] Update translations"
         assignees: ${{ github.repository_owner }}
         body: "Automated translations done by [jeedom/jeetranslate workflow](https://github.com/jeedom/jeetranslate)"
         commit-message: "Auto update translation done by jeedom/jeetranslate workflow"
