@@ -327,7 +327,7 @@ class PluginTranslator():
         if len(texts) == 0:
             return []
 
-        self.__logger.debug(f"call deepl to translate {len(texts)} text(s) in {target_language}")
+        self.__logger.info(f"call deepl to translate {len(texts)} text(s) in {target_language}")
         self.__api_call_counter += 1
         result = self.__deepl_client.translate_text(
             texts,
