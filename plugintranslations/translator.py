@@ -11,6 +11,7 @@ from deepl.api_data import (
 )
 
 from .throttle import Throttle
+from .prompt import Prompt
 
 from .version import VERSION
 from .source_file import SourceFile
@@ -243,6 +244,12 @@ class PluginTranslator():
 
     def do_translate(self):
         self.__logger.info("Find existing translations...")
+        missing_translations_by_language: dict[str, list[tuple[Prompt, str]]] = {
+            target_language: []
+            for target_language in self.__target_languages
+            if target_language != self.__source_language
+        }
+
         for file in self.__files.values():
             for prompt in file.get_prompts().values():
                 # first get translations from existing translations (plugin & core) if exists
@@ -254,14 +261,24 @@ class PluginTranslator():
                 prompt.set_translation(self.__source_language, prompt.get_text())
 
                 if self.deepl_client is not None:
-                    # make call to deepl translator for any missing translations
+                    # Queue missing translations so each target language is translated in one batch.
                     for target_language in self.__target_languages:
                         if target_language == self.__source_language:
                             continue
                         if not prompt.has_translation(target_language):
-                            tr = self.translate_with_deepl(prompt.get_text(), target_language)
-                            prompt.set_translation(target_language, tr)
-                            self.__existing_translations.add_translation(target_language, prompt.get_text(), tr)
+                            missing_translations_by_language[target_language].append((prompt, prompt.get_text()))
+
+        if self.deepl_client is not None:
+            for target_language, missing_translations in missing_translations_by_language.items():
+                if len(missing_translations) == 0:
+                    continue
+
+                texts = [text for _, text in missing_translations]
+                translations = self.translate_with_deepl_batch(texts, target_language)
+                for (prompt, source_text), translation in zip(missing_translations, translations):
+                    prompt.set_translation(target_language, translation)
+                    self.__existing_translations.add_translation(target_language, source_text, translation)
+
         self.__logger.info(f"Number of api call done: {self.__api_call_counter}")
 
     def translate_info_json(self):
@@ -300,13 +317,20 @@ class PluginTranslator():
 
     @Throttle(seconds=0.5)
     def translate_with_deepl(self, text: str, target_language: str) -> str:
-        if self.__deepl_client is None:
-            return ''
+        return self.translate_with_deepl_batch([text], target_language)[0]
 
-        self.__logger.debug(f"call deepl to translate {text} in {target_language}")
+    @Throttle(seconds=0.5)
+    def translate_with_deepl_batch(self, texts: list[str], target_language: str) -> list[str]:
+        if self.__deepl_client is None:
+            return ['' for _ in texts]
+
+        if len(texts) == 0:
+            return []
+
+        self.__logger.debug(f"call deepl to translate {len(texts)} text(s) in {target_language}")
         self.__api_call_counter += 1
         result = self.__deepl_client.translate_text(
-            text,
+            texts,
             source_lang=LANGUAGES_TO_DEEPL[self.__source_language],
             target_lang=LANGUAGES_TO_DEEPL[target_language],
             preserve_formatting=True,
@@ -314,11 +338,15 @@ class PluginTranslator():
             glossary=self.__glossary,
             model_type='prefer_quality_optimized'
         )
-        if not isinstance(result, deepl.TextResult):
-            self.__logger.error(f"Unexpected result type: {type(result)}")
-            return ''
 
-        return result.text
+        if isinstance(result, deepl.TextResult):
+            return [result.text]
+
+        if not isinstance(result, list) or not all(isinstance(item, deepl.TextResult) for item in result):
+            self.__logger.error(f"Unexpected result type: {type(result)}")
+            return ['' for _ in texts]
+
+        return [item.text for item in result]
 
     def get_plugin_translations(self):
         self.__logger.info("Read plugin translations file...")

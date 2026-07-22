@@ -6,6 +6,7 @@ import pytest
 
 import plugintranslations.translator as translator_module
 from plugintranslations.translator import PluginTranslator
+from plugintranslations.prompt import Prompt
 from plugintranslations.consts import (
     EN_US,
     FR_FR,
@@ -75,8 +76,10 @@ class TestPluginTranslator():
         os.environ['DEEPL_API_KEY'] = 'fake-key'
 
         glossary_file = Path(translator_module.__file__).with_name(f"{FR_FR}_glossary.json")
-        glossary_text = glossary_file.read_text(encoding="UTF-8")
-        md5_hash = hashlib.md5(glossary_text.encode('utf-8')).hexdigest()
+        glossary_entries = json.loads(glossary_file.read_text(encoding="UTF-8"))
+        md5_hash = hashlib.md5(
+            json.dumps(glossary_entries, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')
+        ).hexdigest()
 
         class FakeGlossary:
             def __init__(self, name: str):
@@ -111,4 +114,64 @@ class TestPluginTranslator():
         assert len(client.created) == 1
         assert client.created[0][0] == md5_hash
         assert len(client.created[0][1]) == 2
-        assert test_translate._PluginTranslator__glossary.name == md5_hash
+        glossary = getattr(test_translate, '_PluginTranslator__glossary')
+        assert glossary.name == md5_hash
+
+    def test_do_translate_batches_missing_translations_by_language(self, current_working_dir, monkeypatch):
+        os.environ['DEEPL_API_KEY'] = 'fake-key'
+
+        class FakeTextResult:
+            def __init__(self, text: str):
+                self.text = text
+
+        class FakeClient:
+            def __init__(self, auth_key: str):
+                self.auth_key = auth_key
+                self.calls = []
+
+            def list_multilingual_glossaries(self):
+                return []
+
+            def create_multilingual_glossary(self, name, dictionaries):
+                return None
+
+            def translate_text(self, texts, **kwargs):
+                self.calls.append((list(texts), kwargs['target_lang']))
+                return [FakeTextResult(f"{kwargs['target_lang']}::{text}") for text in texts]
+
+        class FakeSourceFile:
+            def __init__(self, *texts: str):
+                self._prompts = {text: Prompt(text) for text in texts}
+
+            def get_prompts(self):
+                return self._prompts
+
+        monkeypatch.setattr(translator_module.deepl, 'DeepLClient', FakeClient)
+        monkeypatch.setattr(translator_module.deepl, 'TextResult', FakeTextResult)
+
+        test_translate = PluginTranslator(current_working_dir)
+        setattr(test_translate, '_PluginTranslator__files', {
+            'plugins/fake_plugin/file1.php': FakeSourceFile('Bonjour', 'Au revoir'),
+            'plugins/fake_plugin/file2.php': FakeSourceFile('Merci'),
+        })
+
+        test_translate.do_translate()
+
+        client = test_translate.deepl_client
+
+        assert isinstance(client, FakeClient)
+        assert len(client.calls) == 3
+        assert client.calls == [
+            (['Bonjour', 'Au revoir', 'Merci'], 'EN-US'),
+            (['Bonjour', 'Au revoir', 'Merci'], 'ES'),
+            (['Bonjour', 'Au revoir', 'Merci'], 'DE'),
+        ]
+
+        for source_file in getattr(test_translate, '_PluginTranslator__files').values():
+            for prompt in source_file.get_prompts().values():
+                assert prompt.get_translation(FR_FR) == prompt.get_text()
+                assert prompt.get_translation(EN_US) == f"EN-US::{prompt.get_text()}"
+                assert prompt.get_translation(ES_ES) == f"ES::{prompt.get_text()}"
+                assert prompt.get_translation(DE_DE) == f"DE::{prompt.get_text()}"
+
+        assert getattr(test_translate, '_PluginTranslator__api_call_counter') == 3
