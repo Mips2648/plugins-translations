@@ -1,4 +1,7 @@
 {
+    "de_DE": {
+        "batterie": "batterie"
+    },
     "en_US": {
         "actif": "active",
         "action": "action",
@@ -7,6 +10,7 @@
         "pièce": "room",
         "port": "port",
         "type": "type",
-        "vrai": "true"
+        "vrai": "true",
+        "batterie": "battery"
     }
 }
