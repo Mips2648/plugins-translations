@@ -181,8 +181,8 @@ class PluginTranslator():
             return
 
         str_entries = glossary_file.read_text(encoding="UTF-8")
-        md5_hash = hashlib.md5(str_entries.encode('utf-8')).hexdigest()
         entries = json.loads(str_entries)
+        md5_hash = hashlib.md5(json.dumps(entries, ensure_ascii=False, sort_keys=True, separators=(',', ':')).encode('utf-8')).hexdigest()
         glossary_dictionaries = []
 
         for target_language, target_entries in entries.items():
