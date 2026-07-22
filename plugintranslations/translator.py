@@ -5,6 +5,10 @@ from pathlib import Path
 import hashlib
 
 import deepl
+from deepl.api_data import (
+    MultilingualGlossaryDictionaryEntries,
+    MultilingualGlossaryInfo,
+)
 
 from .throttle import Throttle
 
@@ -52,7 +56,7 @@ class PluginTranslator():
 
         self.__core_root = cwd/CORE_ROOT
 
-        self.__deepl_translator: deepl.Translator | None = None
+        self.__deepl_client: deepl.DeepLClient | None = None
         self.__deepl_api_key: str | None = None
         self.__api_call_counter = 0
 
@@ -62,23 +66,23 @@ class PluginTranslator():
         self.__get_inputs()
         self.__read_info_json()
 
-        self.__glossary: dict[str, deepl.GlossaryInfo | None] = {lang: None for lang in self.__target_languages}
+        self.__glossary: MultilingualGlossaryInfo | None = None
 
         self.__logger.info(f"Translate plugin module version {VERSION} initialized with deepl version {deepl.__version__}")
 
     def __del__(self):
-        if self.__deepl_translator is None:
+        if self.__deepl_client is None:
             return
 
     @property
-    def deepl_translator(self):
-        if self.__deepl_translator is not None:
-            return self.__deepl_translator
+    def deepl_client(self):
+        if self.__deepl_client is not None:
+            return self.__deepl_client
 
         if self.__deepl_api_key is not None:
-            self.__deepl_translator = deepl.Translator(self.__deepl_api_key)
-            self.__create_deepl_glossaries(self.__deepl_translator)
-        return self.__deepl_translator
+            self.__deepl_client = deepl.DeepLClient(self.__deepl_api_key)
+            self.__create_deepl_glossaries(self.__deepl_client)
+        return self.__deepl_client
 
     @property
     def plugin_id(self) -> str:
@@ -170,7 +174,7 @@ class PluginTranslator():
         self.__info_json_content['language'] = sorted(set([self.__source_language] + self.__target_languages))
         self.__info_json_file.write_text(json.dumps(self.__info_json_content, ensure_ascii=False, indent='\t'), encoding="UTF-8")
 
-    def __create_deepl_glossaries(self, deepl_translator: deepl.Translator):
+    def __create_deepl_glossaries(self, deepl_client: deepl.DeepLClient):
         file_dir = Path(__file__).parent
         glossary_file = file_dir/f"{self.__source_language}_glossary.json"
         if not glossary_file.exists():
@@ -179,25 +183,40 @@ class PluginTranslator():
         str_entries = glossary_file.read_text(encoding="UTF-8")
         md5_hash = hashlib.md5(str_entries.encode('utf-8')).hexdigest()
         entries = json.loads(str_entries)
-        deepl_glossaries = deepl_translator.list_glossaries()
+        glossary_dictionaries = []
 
-        for target_language in self.__target_languages:
-            if target_language == self.__source_language or target_language not in entries:
+        for target_language, target_entries in entries.items():
+            if target_language == self.__source_language:
                 continue
-            self.__logger.info(f"Check glossary {self.__source_language}=>{target_language}")
+            if target_language not in LANGUAGES_TO_DEEPL_GLOSSARY:
+                self.__logger.warning(f"Glossary target language {target_language} is not supported by DeepL glossary API, skipping")
+                continue
+            glossary_dictionaries.append(
+                MultilingualGlossaryDictionaryEntries(
+                    LANGUAGES_TO_DEEPL_GLOSSARY[self.__source_language],
+                    LANGUAGES_TO_DEEPL_GLOSSARY[target_language],
+                    target_entries,
+                )
+            )
 
-            for deepl_glossary in deepl_glossaries:
-                if deepl_glossary.source_lang == LANGUAGES_TO_DEEPL_GLOSSARY[self.__source_language] and deepl_glossary.target_lang == LANGUAGES_TO_DEEPL_GLOSSARY[target_language]:
-                    if deepl_glossary.name == md5_hash:
-                        self.__logger.info("Already exists")
-                        self.__glossary[target_language] = deepl_glossary
-                    else:
-                        self.__logger.info(f"Delete existing old glossary {deepl_glossary.name}")
-                        deepl_translator.delete_glossary(deepl_glossary)
-            if self.__glossary[target_language] is None:
-                self.__logger.info(f"Create new glossary {md5_hash}")
-                self.__glossary[target_language] = deepl_translator.create_glossary(md5_hash, source_lang=LANGUAGES_TO_DEEPL_GLOSSARY[self.__source_language],
-                                                                                    target_lang=LANGUAGES_TO_DEEPL_GLOSSARY[target_language], entries=entries[target_language])
+        if len(glossary_dictionaries) == 0:
+            self.__logger.warning("No glossary dictionaries found, skipping glossary creation")
+            return
+
+        self.__logger.info(f"Check glossary {md5_hash}")
+
+        for deepl_glossary in deepl_client.list_multilingual_glossaries():
+            if deepl_glossary.name == md5_hash and self.__glossary is None:
+                self.__logger.info("Already exists")
+                self.__glossary = deepl_glossary
+                return
+            else:
+                self.__logger.info(f"Delete existing old glossary {deepl_glossary.name}")
+                deepl_client.delete_multilingual_glossary(deepl_glossary)
+
+        if self.__glossary is None:
+            self.__logger.info(f"Create new glossary {md5_hash}")
+            self.__glossary = deepl_client.create_multilingual_glossary(md5_hash, glossary_dictionaries)
 
     def find_prompts_in_all_files(self):
         self.__logger.info("Find prompts in all plugin files")
@@ -234,7 +253,7 @@ class PluginTranslator():
                 # make sure to store text as a target translation for source language
                 prompt.set_translation(self.__source_language, prompt.get_text())
 
-                if self.deepl_translator is not None:
+                if self.deepl_client is not None:
                     # make call to deepl translator for any missing translations
                     for target_language in self.__target_languages:
                         if target_language == self.__source_language:
@@ -246,7 +265,7 @@ class PluginTranslator():
         self.__logger.info(f"Number of api call done: {self.__api_call_counter}")
 
     def translate_info_json(self):
-        if self.deepl_translator is None:
+        if self.deepl_client is None:
             return
         if self.__info_json_content is None:
             return
@@ -281,18 +300,18 @@ class PluginTranslator():
 
     @Throttle(seconds=0.5)
     def translate_with_deepl(self, text: str, target_language: str) -> str:
-        if self.__deepl_translator is None:
+        if self.__deepl_client is None:
             return ''
 
         self.__logger.debug(f"call deepl to translate {text} in {target_language}")
         self.__api_call_counter += 1
-        result = self.__deepl_translator.translate_text(
+        result = self.__deepl_client.translate_text(
             text,
             source_lang=LANGUAGES_TO_DEEPL[self.__source_language],
             target_lang=LANGUAGES_TO_DEEPL[target_language],
             preserve_formatting=True,
             context='home automation',
-            glossary=self.__glossary[target_language],
+            glossary=self.__glossary,
             model_type='prefer_quality_optimized'
         )
         if not isinstance(result, deepl.TextResult):

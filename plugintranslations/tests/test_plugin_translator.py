@@ -1,8 +1,10 @@
 import json
 import os
+import hashlib
 from pathlib import Path
 import pytest
 
+import plugintranslations.translator as translator_module
 from plugintranslations.translator import PluginTranslator
 from plugintranslations.consts import (
     EN_US,
@@ -68,3 +70,45 @@ class TestPluginTranslator():
         self._test_translate.get_plugin_translations()
         # Assert
         assert 1
+
+    def test_create_single_multilingual_glossary(self, current_working_dir, monkeypatch):
+        os.environ['DEEPL_API_KEY'] = 'fake-key'
+
+        glossary_file = Path(translator_module.__file__).with_name(f"{FR_FR}_glossary.json")
+        glossary_text = glossary_file.read_text(encoding="UTF-8")
+        md5_hash = hashlib.md5(glossary_text.encode('utf-8')).hexdigest()
+
+        class FakeGlossary:
+            def __init__(self, name: str):
+                self.name = name
+                self.glossary_id = f"id-{name}"
+                self.dictionaries = []
+
+        class FakeClient:
+            def __init__(self, auth_key: str):
+                self.auth_key = auth_key
+                self.deleted = []
+                self.created = []
+
+            def list_multilingual_glossaries(self):
+                return [FakeGlossary('obsolete-glossary')]
+
+            def delete_multilingual_glossary(self, glossary):
+                self.deleted.append(glossary.name)
+
+            def create_multilingual_glossary(self, name, dictionaries):
+                self.created.append((name, dictionaries))
+                return FakeGlossary(name)
+
+        monkeypatch.setattr(translator_module.deepl, 'DeepLClient', FakeClient)
+
+        test_translate = PluginTranslator(current_working_dir)
+
+        client = test_translate.deepl_client
+
+        assert isinstance(client, FakeClient)
+        assert client.deleted == ['obsolete-glossary']
+        assert len(client.created) == 1
+        assert client.created[0][0] == md5_hash
+        assert len(client.created[0][1]) == 2
+        assert test_translate._PluginTranslator__glossary.name == md5_hash
