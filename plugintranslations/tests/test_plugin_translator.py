@@ -73,7 +73,7 @@ class TestPluginTranslator():
         assert 1
 
     def test_create_single_multilingual_glossary(self, current_working_dir, monkeypatch):
-        os.environ['DEEPL_API_KEY'] = 'fake-key'
+        os.environ['deepl_api_key'] = 'fake-key'
 
         glossary_file = Path(translator_module.__file__).with_name(f"{FR_FR}_glossary.json")
         glossary_entries = json.loads(glossary_file.read_text(encoding="UTF-8"))
@@ -118,7 +118,7 @@ class TestPluginTranslator():
         assert glossary.name == md5_hash
 
     def test_do_translate_batches_missing_translations_by_language(self, current_working_dir, monkeypatch):
-        os.environ['DEEPL_API_KEY'] = 'fake-key'
+        os.environ['deepl_api_key'] = 'fake-key'
 
         class FakeTextResult:
             def __init__(self, text: str):
@@ -177,7 +177,7 @@ class TestPluginTranslator():
         assert getattr(test_translate, '_PluginTranslator__api_call_counter') == 3
 
     def test_translate_with_deepl_batch_omits_glossary_for_missing_target_language(self, current_working_dir, monkeypatch):
-        os.environ['DEEPL_API_KEY'] = 'fake-key'
+        os.environ['deepl_api_key'] = 'fake-key'
         os.environ[INPUT_TARGET_LANGUAGES] = f'{EN_US},{ES_ES}'
 
         class FakeTextResult:
