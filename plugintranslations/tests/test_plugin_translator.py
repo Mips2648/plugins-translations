@@ -82,10 +82,10 @@ class TestPluginTranslator():
         ).hexdigest()
 
         class FakeGlossary:
-            def __init__(self, name: str):
+            def __init__(self, name: str, dictionaries=None):
                 self.name = name
                 self.glossary_id = f"id-{name}"
-                self.dictionaries = []
+                self.dictionaries = dictionaries or []
 
         class FakeClient:
             def __init__(self, auth_key: str):
@@ -101,7 +101,7 @@ class TestPluginTranslator():
 
             def create_multilingual_glossary(self, name, dictionaries):
                 self.created.append((name, dictionaries))
-                return FakeGlossary(name)
+                return FakeGlossary(name, dictionaries)
 
         monkeypatch.setattr(translator_module.deepl, 'DeepLClient', FakeClient)
 
@@ -175,3 +175,47 @@ class TestPluginTranslator():
                 assert prompt.get_translation(DE_DE) == f"DE::{prompt.get_text()}"
 
         assert getattr(test_translate, '_PluginTranslator__api_call_counter') == 3
+
+    def test_translate_with_deepl_batch_omits_glossary_for_missing_target_language(self, current_working_dir, monkeypatch):
+        os.environ['DEEPL_API_KEY'] = 'fake-key'
+        os.environ[INPUT_TARGET_LANGUAGES] = f'{EN_US},{ES_ES}'
+
+        class FakeTextResult:
+            def __init__(self, text: str):
+                self.text = text
+
+        class FakeGlossary:
+            def __init__(self, name: str, dictionaries=None):
+                self.name = name
+                self.dictionaries = dictionaries or []
+
+        class FakeClient:
+            def __init__(self, auth_key: str):
+                self.auth_key = auth_key
+                self.calls = []
+
+            def list_multilingual_glossaries(self):
+                return []
+
+            def create_multilingual_glossary(self, name, dictionaries):
+                return FakeGlossary(name, dictionaries)
+
+            def translate_text(self, texts, **kwargs):
+                self.calls.append(kwargs)
+                return [FakeTextResult(text) for text in texts]
+
+        monkeypatch.setattr(translator_module.deepl, 'DeepLClient', FakeClient)
+        monkeypatch.setattr(translator_module.deepl, 'TextResult', FakeTextResult)
+
+        test_translate = PluginTranslator(current_working_dir)
+        _ = test_translate.deepl_client
+
+        test_translate.translate_with_deepl_batch(['Bonjour'], EN_US)
+        test_translate.translate_with_deepl_batch(['Bonjour'], ES_ES)
+
+        client = test_translate.deepl_client
+
+        assert isinstance(client, FakeClient)
+        assert len(client.calls) == 2
+        assert client.calls[0]['glossary'] is not None
+        assert client.calls[1]['glossary'] is None

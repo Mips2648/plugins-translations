@@ -327,6 +327,13 @@ class PluginTranslator():
         if len(texts) == 0:
             return []
 
+        deepl_target_language = LANGUAGES_TO_DEEPL_GLOSSARY.get(target_language)
+        glossary = self.__glossary if (
+            self.__glossary is not None
+            and deepl_target_language is not None
+            and any(dictionary.target_lang == deepl_target_language for dictionary in self.__glossary.dictionaries)
+        ) else None
+
         self.__logger.info(f"call deepl to translate {len(texts)} text(s) in {target_language}")
         self.__api_call_counter += 1
         result = self.__deepl_client.translate_text(
@@ -335,7 +342,7 @@ class PluginTranslator():
             target_lang=LANGUAGES_TO_DEEPL[target_language],
             preserve_formatting=True,
             context='home automation',
-            glossary=self.__glossary,
+            glossary=glossary,
             model_type='prefer_quality_optimized'
         )
 
