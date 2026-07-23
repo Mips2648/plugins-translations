@@ -78,7 +78,6 @@ runs:
     - name: "Debug i18n git visibility"
       shell: bash
       run: |
-        set -x
         cd plugin
 
         echo "== Files in core/i18n =="
