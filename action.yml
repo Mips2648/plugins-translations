@@ -75,6 +75,43 @@ runs:
         export PYTHONPATH=$PYTHONPATH:${{ github.action_path }}
         python -m plugintranslations
 
+    - name: "Debug i18n git visibility"
+      shell: bash
+      run: |
+        set -x
+        cd plugin
+
+        echo "== Files in core/i18n =="
+        ls -la core/i18n || true
+
+        echo "== Git status (including ignored) =="
+        git status --short --ignored
+
+        echo "== Focus on i18n + info.json =="
+        git status --short --ignored -- core/i18n plugin_info/info.json
+
+        echo "== Check ignore rules for i18n json =="
+        find core/i18n -maxdepth 1 -type f -name '*.json' -print0 2>/dev/null | xargs -0r -I{} git check-ignore -v "{}" || true
+
+        echo "== Dry-run add with current pathspec =="
+        git add -n -- core/i18n/*.json plugin_info/info.json || true
+
+    - name: "Validate i18n json match"
+      shell: bash
+      run: |
+        cd plugin
+        shopt -s nullglob
+        files=(core/i18n/*.json)
+
+        if [ ${#files[@]} -eq 0 ]; then
+          echo "::error::No file matched core/i18n/*.json after translation generation. Check .gitignore rules and translation logs."
+          git status --short --ignored -- core/i18n plugin_info/info.json || true
+          exit 1
+        fi
+
+        echo "Matched JSON files:"
+        printf '%s\n' "${files[@]}"
+
     - name: "Create Pull Request to plugin..."
       uses: peter-evans/create-pull-request@v8
       with:
