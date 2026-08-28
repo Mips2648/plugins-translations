@@ -3,6 +3,7 @@
 A GitHub action to automatically generate translation files for your plugins and optionally automatically translated texts if all languages you want.
 
 [![pytest](https://github.com/Mips2648/plugins-translations/actions/workflows/pytest.yml/badge.svg)](https://github.com/Mips2648/plugins-translations/actions/workflows/pytest.yml)
+[![Sponsor Mips2648](https://img.shields.io/badge/Sponsor-Mips2648-ea4aaa?logo=githubsponsors)](https://github.com/sponsors/Mips2648)
 
 ## How it works
 
