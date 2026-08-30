@@ -1,6 +1,16 @@
 {
+    "es_ES": {
+        "parti": "se ha ido"
+    },
+    "it_IT": {
+        "parti": "andato"
+    },
+    "pt_PT": {
+        "parti": "partiu"
+    },
     "de_DE": {
-        "batterie": "batterie"
+        "batterie": "batterie",
+        "parti": "gegangen"
     },
     "en_US": {
         "actif": "active",
@@ -11,6 +21,7 @@
         "port": "port",
         "type": "type",
         "vrai": "true",
-        "batterie": "battery"
+        "batterie": "battery",
+        "parti": "left"
     }
 }
